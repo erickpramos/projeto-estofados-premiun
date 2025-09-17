@@ -44,12 +44,21 @@ import {
   HelpCircle,
   Lock,
   RotateCcw,
-  Info
+  Info,
+  Send,
+  MapPin as Map,
+  Globe,
+  Calendar,
+  CreditCard,
+  Star as StarFilled,
+  Camera,
+  Verified
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 const WHATSAPP_NUMBER = "21996197768";
+const WHATSAPP_LINK = "https://wa.me/21996197768";
 
 // Context for authentication and cart
 const AppContext = React.createContext();
@@ -78,6 +87,8 @@ const AppProvider = ({ children }) => {
     environment: 'all'
   });
   const [sortBy, setSortBy] = useState('name');
+  const [newsletter, setNewsletter] = useState('');
+  const [showNewsletter, setShowNewsletter] = useState(false);
 
   const api = axios.create({
     baseURL: API,
@@ -197,6 +208,21 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  // Newsletter subscription
+  const subscribeNewsletter = async (email) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      toast.success('Inscrito na newsletter com sucesso!');
+      setNewsletter('');
+      setShowNewsletter(false);
+      return true;
+    } catch (error) {
+      toast.error('Erro ao inscrever na newsletter');
+      return false;
+    }
+  };
+
   // Filter and search products
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -220,6 +246,16 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     loadData();
+    
+    // Show newsletter popup after 30 seconds
+    const timer = setTimeout(() => {
+      if (!localStorage.getItem('newsletter_shown')) {
+        setShowNewsletter(true);
+        localStorage.setItem('newsletter_shown', 'true');
+      }
+    }, 30000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -245,12 +281,17 @@ const AppProvider = ({ children }) => {
     sortBy,
     setSortBy,
     filteredProducts,
+    newsletter,
+    setNewsletter,
+    showNewsletter,
+    setShowNewsletter,
     login,
     register,
     logout,
     addToCart,
     removeFromCart,
-    loadData
+    loadData,
+    subscribeNewsletter
   };
 
   return (
@@ -303,6 +344,92 @@ const BackToTop = () => {
   );
 };
 
+// WhatsApp Floating Button
+const WhatsAppFloat = () => {
+  const openWhatsApp = () => {
+    const url = `${WHATSAPP_LINK}?text=Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.`;
+    window.open(url, '_blank');
+  };
+
+  return (
+    <button
+      onClick={openWhatsApp}
+      className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition-all z-50 whatsapp-float"
+      aria-label="Falar no WhatsApp"
+    >
+      <MessageCircle size={24} />
+    </button>
+  );
+};
+
+// Newsletter Popup
+const NewsletterPopup = () => {
+  const { showNewsletter, setShowNewsletter, newsletter, setNewsletter, subscribeNewsletter, isLoading } = useAppContext();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newsletter.trim()) {
+      await subscribeNewsletter(newsletter);
+    }
+  };
+
+  if (!showNewsletter) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl max-w-md w-full p-8 relative">
+        <button
+          onClick={() => setShowNewsletter(false)}
+          className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-lg transition-colors"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="text-center mb-6">
+          <div className="bg-amber-100 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <Mail className="text-amber-600" size={24} />
+          </div>
+          <h3 className="text-2xl font-bold text-slate-800 mb-2">
+            Fique por dentro das novidades!
+          </h3>
+          <p className="text-slate-600">
+            Receba ofertas exclusivas, lançamentos e dicas de decoração
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Seu melhor email"
+            value={newsletter}
+            onChange={(e) => setNewsletter(e.target.value)}
+            required
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+          >
+            {isLoading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            ) : (
+              <>
+                <Send size={18} />
+                <span>Quero receber ofertas</span>
+              </>
+            )}
+          </button>
+        </form>
+
+        <p className="text-xs text-slate-500 text-center mt-4">
+          Não enviamos spam. Você pode cancelar a qualquer momento.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 // Header Component with Search
 const Header = () => {
   const { user, cart, logout, searchTerm, setSearchTerm } = useAppContext();
@@ -311,7 +438,7 @@ const Header = () => {
   const [showAuth, setShowAuth] = useState(false);
 
   const openWhatsApp = () => {
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.`;
+    const url = `${WHATSAPP_LINK}?text=Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.`;
     window.open(url, '_blank');
   };
 
@@ -468,7 +595,7 @@ const ProductCard = ({ product }) => {
 
   const openWhatsApp = () => {
     const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações.`;
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
@@ -551,7 +678,7 @@ const HeroSection = () => {
   }, []);
 
   const openWhatsApp = () => {
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de conhecer mais sobre os produtos premium da Estofados Premium Outlet.`;
+    const url = `${WHATSAPP_LINK}?text=Olá! Gostaria de conhecer mais sobre os produtos premium da Estofados Premium Outlet.`;
     window.open(url, '_blank');
   };
 
@@ -694,6 +821,58 @@ const CategoriesSection = () => {
   );
 };
 
+// Trust Badges Section
+const TrustBadgesSection = () => {
+  return (
+    <section className="py-16 bg-white">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-slate-800 mb-4">
+            Nossa <span className="text-amber-600">Garantia</span> de Qualidade
+          </h2>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            Certificações e compromissos que fazem da Estofados Premium sua melhor escolha
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="text-center">
+            <div className="bg-green-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <Verified className="text-green-600" size={32} />
+            </div>
+            <h3 className="font-semibold text-slate-800 mb-2">SSL Seguro</h3>
+            <p className="text-sm text-slate-600">Transações 100% seguras</p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-blue-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <Award className="text-blue-600" size={32} />
+            </div>
+            <h3 className="font-semibold text-slate-800 mb-2">ISO 9001</h3>
+            <p className="text-sm text-slate-600">Qualidade certificada</p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-purple-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <Shield className="text-purple-600" size={32} />
+            </div>
+            <h3 className="font-semibold text-slate-800 mb-2">Garantia 2 Anos</h3>
+            <p className="text-sm text-slate-600">Cobertura total</p>
+          </div>
+
+          <div className="text-center">
+            <div className="bg-amber-100 p-4 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+              <Truck className="text-amber-600" size={32} />
+            </div>
+            <h3 className="font-semibold text-slate-800 mb-2">Entrega Expressa</h3>
+            <p className="text-sm text-slate-600">Até 48h na região</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // Products Page Component
 const ProductsPage = () => {
   const { 
@@ -754,6 +933,25 @@ const ProductsPage = () => {
                   <option value="popular">Mais populares</option>
                 </select>
               </div>
+
+              {/* Trust Elements */}
+              <div className="border-t pt-6">
+                <h4 className="font-semibold text-slate-800 mb-4">Por que escolher a gente?</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Shield className="text-green-500 mr-2" size={16} />
+                    <span>Garantia de 2 anos</span>
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Truck className="text-blue-500 mr-2" size={16} />
+                    <span>Frete grátis RJ</span>
+                  </div>
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Award className="text-amber-500 mr-2" size={16} />
+                    <span>Qualidade premium</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -809,7 +1007,7 @@ const ProductDetailPage = () => {
   const openWhatsApp = () => {
     if (!product) return;
     const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações sobre especificações, disponibilidade e formas de pagamento.`;
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
@@ -991,15 +1189,15 @@ const AboutPage = () => {
         {/* Company Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
           <div className="text-center bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl font-bold text-amber-600 mb-2">10+</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">12+</div>
             <div className="text-slate-600">Anos de Experiência</div>
           </div>
           <div className="text-center bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl font-bold text-amber-600 mb-2">5000+</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">8500+</div>
             <div className="text-slate-600">Clientes Satisfeitos</div>
           </div>
           <div className="text-center bg-white p-6 rounded-lg shadow-md">
-            <div className="text-3xl font-bold text-amber-600 mb-2">50+</div>
+            <div className="text-3xl font-bold text-amber-600 mb-2">200+</div>
             <div className="text-slate-600">Modelos Exclusivos</div>
           </div>
           <div className="text-center bg-white p-6 rounded-lg shadow-md">
@@ -1076,8 +1274,38 @@ const AboutPage = () => {
           </div>
         </div>
 
+        {/* Location Section */}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-600 rounded-lg p-8 text-white mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-4">Nossa Localização</h2>
+              <div className="space-y-4">
+                <div className="flex items-center">
+                  <MapPin className="text-amber-400 mr-3" size={20} />
+                  <span>Rua das Flores, 123 - Copacabana, Rio de Janeiro - RJ</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="text-amber-400 mr-3" size={20} />
+                  <span>(21) 99619-7768</span>
+                </div>
+                <div className="flex items-center">
+                  <Clock className="text-amber-400 mr-3" size={20} />
+                  <span>Segunda a Sexta: 9h às 18h | Sábado: 9h às 16h</span>
+                </div>
+              </div>
+            </div>
+            <div className="bg-slate-200 rounded-lg h-64 flex items-center justify-center">
+              <div className="text-center text-slate-600">
+                <Map size={48} className="mx-auto mb-2" />
+                <p>Mapa Interativo</p>
+                <p className="text-sm">Em breve: Google Maps integrado</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Contact CTA */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-gradient-to-r from-amber-500 to-amber-600 rounded-lg p-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Pronto para conhecer nossos produtos?</h2>
           <p className="text-xl mb-6">
             Visite nosso showroom ou entre em contato para uma consultoria personalizada
@@ -1085,13 +1313,13 @@ const AboutPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/produtos"
-              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="bg-white text-amber-600 hover:bg-slate-100 px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Ver Produtos
             </Link>
             <Link
               to="/contato"
-              className="border-2 border-white text-white hover:bg-white hover:text-slate-800 px-8 py-3 rounded-lg font-semibold transition-colors"
+              className="border-2 border-white text-white hover:bg-white hover:text-amber-600 px-8 py-3 rounded-lg font-semibold transition-colors"
             >
               Fale Conosco
             </Link>
@@ -1102,10 +1330,140 @@ const AboutPage = () => {
   );
 };
 
-// Contact Page
+// FAQ Page
+const FAQPage = () => {
+  const [openFAQ, setOpenFAQ] = useState(null);
+
+  const faqs = [
+    {
+      question: "Qual é o prazo de entrega?",
+      answer: "Para a região metropolitana do Rio de Janeiro, o prazo é de 3 a 5 dias úteis. Para outras localidades, pode variar de 7 a 15 dias úteis, dependendo da distância."
+    },
+    {
+      question: "Vocês fazem entrega e montagem?",
+      answer: "Sim! Oferecemos serviço completo de entrega e montagem gratuita para toda a região metropolitana do Rio de Janeiro. Nossa equipe especializada cuida de tudo para você."
+    },
+    {
+      question: "Qual é a garantia dos produtos?",
+      answer: "Todos os nossos produtos possuem garantia de 2 anos contra defeitos de fabricação. Além disso, oferecemos suporte técnico completo durante todo o período de garantia."
+    },
+    {
+      question: "Posso personalizar os móveis?",
+      answer: "Claro! Trabalhamos com personalização de tecidos, cores e acabamentos. Entre em contato conosco via WhatsApp para discutir suas necessidades específicas."
+    },
+    {
+      question: "Quais são as formas de pagamento?",
+      answer: "Aceitamos cartão de crédito (até 12x), cartão de débito, PIX, transferência bancária e dinheiro. Para compras acima de R$ 3.000, oferecemos condições especiais de parcelamento."
+    },
+    {
+      question: "Vocês têm showroom físico?",
+      answer: "Sim! Nosso showroom fica localizado em Copacabana. Você pode visitar para ver nossos produtos pessoalmente e receber consultoria especializada."
+    },
+    {
+      question: "Como funciona a política de troca?",
+      answer: "Oferecemos 7 dias para arrependimento da compra. O produto deve estar em perfeitas condições, sem uso e na embalagem original. Consulte nossa política completa de trocas."
+    },
+    {
+      question: "Fazem orçamento personalizado?",
+      answer: "Sim! Entre em contato via WhatsApp ou visite nossa loja. Nossos consultores farão um orçamento personalizado baseado nas suas necessidades e espaço disponível."
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'FAQ - Perguntas Frequentes' }]} />
+        
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+            Perguntas <span className="text-amber-600">Frequentes</span>
+          </h1>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            Encontre respostas rápidas para as dúvidas mais comuns sobre nossos produtos e serviços
+          </p>
+        </div>
+
+        <div className="max-w-4xl mx-auto">
+          {faqs.map((faq, index) => (
+            <div key={index} className="mb-4 bg-white rounded-lg shadow-md overflow-hidden">
+              <button
+                onClick={() => setOpenFAQ(openFAQ === index ? null : index)}
+                className="w-full p-6 text-left flex items-center justify-between hover:bg-slate-50 transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-slate-800">{faq.question}</h3>
+                <div className={`transform transition-transform ${openFAQ === index ? 'rotate-180' : ''}`}>
+                  <ChevronRight size={20} className="text-amber-500" />
+                </div>
+              </button>
+              
+              {openFAQ === index && (
+                <div className="px-6 pb-6 border-t border-slate-200">
+                  <p className="text-slate-600 leading-relaxed pt-4">{faq.answer}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Contact CTA */}
+        <div className="mt-12 text-center bg-white rounded-lg p-8 shadow-md">
+          <h2 className="text-2xl font-bold text-slate-800 mb-4">Não encontrou sua resposta?</h2>
+          <p className="text-slate-600 mb-6">
+            Nossa equipe está pronta para esclarecer todas as suas dúvidas
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/contato"
+              className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Entre em Contato
+            </Link>
+            <button
+              onClick={() => {
+                const url = `${WHATSAPP_LINK}?text=Olá! Tenho uma dúvida que não encontrei no FAQ.`;
+                window.open(url, '_blank');
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+            >
+              <MessageCircle size={18} />
+              <span>WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Contact Page with Form
 const ContactPage = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Simulate form submission
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      toast.success('Mensagem enviada com sucesso! Entraremos em contato em breve.');
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+    } catch (error) {
+      toast.error('Erro ao enviar mensagem. Tente novamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const openWhatsApp = () => {
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de entrar em contato com a Estofados Premium Outlet.`;
+    const url = `${WHATSAPP_LINK}?text=Olá! Gostaria de entrar em contato com a Estofados Premium Outlet.`;
     window.open(url, '_blank');
   };
 
@@ -1124,94 +1482,189 @@ const ContactPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Phone className="text-white" size={24} />
+          {/* Contact Form */}
+          <div className="bg-white rounded-lg shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-slate-800 mb-6">Envie sua Mensagem</h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Nome Completo *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    placeholder="Seu nome completo"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Telefone *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    placeholder="(21) 99999-9999"
+                  />
+                </div>
               </div>
+
               <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Telefone & WhatsApp</h3>
-                <p className="text-slate-600">(21) 99619-7768</p>
-                <button
-                  onClick={openWhatsApp}
-                  className="text-amber-600 hover:text-amber-700 font-semibold mt-1"
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  placeholder="seu@email.com"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Assunto
+                </label>
+                <select
+                  value={formData.subject}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
-                  Clique para conversar →
-                </button>
+                  <option value="">Selecione um assunto</option>
+                  <option value="orcamento">Solicitação de Orçamento</option>
+                  <option value="duvida">Dúvida sobre Produto</option>
+                  <option value="entrega">Informações sobre Entrega</option>
+                  <option value="pos-venda">Pós-venda</option>
+                  <option value="outros">Outros</option>
+                </select>
               </div>
-            </div>
 
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Mail className="text-white" size={24} />
-              </div>
               <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Email</h3>
-                <p className="text-slate-600">contato@estofadospremium.com.br</p>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Mensagem *
+                </label>
+                <textarea
+                  required
+                  rows={5}
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                  placeholder="Digite sua mensagem aqui..."
+                />
               </div>
-            </div>
 
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <MapPin className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Localização</h3>
-                <p className="text-slate-600">Atendemos todo o Rio de Janeiro</p>
-                <p className="text-slate-600">Entrega gratuita na região metropolitana</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Clock className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Horário de Atendimento</h3>
-                <p className="text-slate-600">Segunda a Sexta: 9h às 18h</p>
-                <p className="text-slate-600">Sábado: 9h às 16h</p>
-                <p className="text-slate-600">WhatsApp: 24h disponível</p>
-              </div>
-            </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Enviando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send size={18} />
+                    <span>Enviar Mensagem</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
 
-          {/* CTA Card */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-8 text-white">
-            <div className="text-center">
-              <Crown className="text-amber-400 mx-auto mb-4" size={48} />
-              <h3 className="text-2xl font-bold mb-4">
-                Pronto para transformar sua casa?
-              </h3>
-              <p className="text-slate-300 mb-8 leading-relaxed">
-                Entre em contato conosco e descubra como nossos móveis premium 
-                podem elevar o padrão do seu ambiente com design exclusivo e qualidade superior.
-              </p>
+          {/* Contact Info */}
+          <div className="space-y-8">
+            <div className="bg-white rounded-lg shadow-lg p-8">
+              <h2 className="text-2xl font-bold text-slate-800 mb-6">Informações de Contato</h2>
               
-              <button
-                onClick={openWhatsApp}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
-                           text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
-                           transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mx-auto"
-              >
-                <MessageCircle size={24} />
-                <span>Falar no WhatsApp</span>
-                <ArrowRight size={20} />
-              </button>
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="bg-amber-500 p-3 rounded-lg">
+                    <Phone className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Telefone & WhatsApp</h3>
+                    <p className="text-slate-600">(21) 99619-7768</p>
+                    <button
+                      onClick={openWhatsApp}
+                      className="text-amber-600 hover:text-amber-700 font-semibold mt-1"
+                    >
+                      Clique para conversar →
+                    </button>
+                  </div>
+                </div>
 
-              <div className="flex items-center justify-center space-x-6 mt-8 pt-6 border-t border-slate-600">
-                <div className="text-center">
-                  <Shield className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Garantia Premium</p>
+                <div className="flex items-start space-x-4">
+                  <div className="bg-amber-500 p-3 rounded-lg">
+                    <Mail className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Email</h3>
+                    <p className="text-slate-600">contato@estofadospremium.com.br</p>
+                    <p className="text-slate-600">vendas@estofadospremium.com.br</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <Truck className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Entrega Grátis</p>
+
+                <div className="flex items-start space-x-4">
+                  <div className="bg-amber-500 p-3 rounded-lg">
+                    <MapPin className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Endereço</h3>
+                    <p className="text-slate-600">Rua das Flores, 123</p>
+                    <p className="text-slate-600">Copacabana - Rio de Janeiro - RJ</p>
+                    <p className="text-slate-600">CEP: 22070-001</p>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <Award className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Qualidade Certificada</p>
+
+                <div className="flex items-start space-x-4">
+                  <div className="bg-amber-500 p-3 rounded-lg">
+                    <Clock className="text-white" size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-2">Horário de Atendimento</h3>
+                    <p className="text-slate-600">Segunda a Sexta: 9h às 18h</p>
+                    <p className="text-slate-600">Sábado: 9h às 16h</p>
+                    <p className="text-slate-600">Domingo: Fechado</p>
+                    <p className="text-sm text-green-600 mt-2">WhatsApp: 24h disponível</p>
+                  </div>
                 </div>
+              </div>
+            </div>
+
+            {/* CTA Card */}
+            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-lg p-8 text-white">
+              <div className="text-center">
+                <Crown className="text-amber-400 mx-auto mb-4" size={48} />
+                <h3 className="text-2xl font-bold mb-4">
+                  Atendimento Premium
+                </h3>
+                <p className="text-slate-300 mb-6 leading-relaxed">
+                  Nossa equipe especializada está pronta para oferecer consultoria personalizada 
+                  e encontrar a solução perfeita para seu ambiente.
+                </p>
+                
+                <button
+                  onClick={openWhatsApp}
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
+                             text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
+                             transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mx-auto"
+                >
+                  <MessageCircle size={24} />
+                  <span>Falar no WhatsApp</span>
+                  <ArrowRight size={20} />
+                </button>
               </div>
             </div>
           </div>
@@ -1290,7 +1743,7 @@ const CartModal = ({ onClose }) => {
     
     const message = `Olá! Gostaria de finalizar minha compra:\n\n${items}\n\nPor favor, me ajude com o processo de compra.`;
     
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    const url = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
@@ -1312,6 +1765,7 @@ const CartModal = ({ onClose }) => {
             <div className="text-center py-8">
               <ShoppingCart className="mx-auto mb-4 text-slate-400" size={48} />
               <p className="text-slate-500 text-lg">Seu carrinho está vazio</p>
+              <p className="text-slate-400 text-sm mt-2">Adicione produtos para começar suas compras</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -1331,7 +1785,8 @@ const CartModal = ({ onClose }) => {
                   <div className="text-right">
                     <button
                       onClick={() => removeFromCart(item.product_id)}
-                      className="text-red-500 hover:text-red-700 mt-1"
+                      className="text-red-500 hover:text-red-700 mt-1 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Remover item"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -1352,6 +1807,9 @@ const CartModal = ({ onClose }) => {
               <MessageCircle size={24} />
               <span>Finalizar no WhatsApp</span>
             </button>
+            <p className="text-xs text-slate-500 text-center mt-2">
+              Clique para enviar seus itens via WhatsApp e finalizar a compra
+            </p>
           </div>
         )}
       </div>
@@ -1406,14 +1864,17 @@ const AuthModal = ({ onClose }) => {
               <User className="text-amber-600" size={32} />
             </div>
             <h3 className="text-xl font-semibold text-slate-800 mb-2">{user.name}</h3>
-            <p className="text-slate-600 mb-6">{user.email}</p>
+            <p className="text-slate-600 mb-2">{user.email}</p>
+            <p className="text-slate-500 text-sm mb-6">Cliente desde {new Date(user.created_at).getFullYear()}</p>
             
-            <button
-              onClick={handleLogout}
-              className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition-colors"
-            >
-              Sair da Conta
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleLogout}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 rounded-lg transition-colors"
+              >
+                Sair da Conta
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1448,6 +1909,7 @@ const AuthModal = ({ onClose }) => {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Seu nome completo"
                 />
               </div>
               <div>
@@ -1460,6 +1922,7 @@ const AuthModal = ({ onClose }) => {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="(21) 99999-9999"
                 />
               </div>
             </>
@@ -1475,6 +1938,7 @@ const AuthModal = ({ onClose }) => {
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="seu@email.com"
             />
           </div>
           
@@ -1488,6 +1952,7 @@ const AuthModal = ({ onClose }) => {
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              placeholder="Sua senha"
             />
           </div>
 
@@ -1515,6 +1980,15 @@ const AuthModal = ({ onClose }) => {
 
 // Footer
 const Footer = () => {
+  const { newsletter, setNewsletter, subscribeNewsletter, isLoading } = useAppContext();
+
+  const handleNewsletterSubmit = async (e) => {
+    e.preventDefault();
+    if (newsletter.trim()) {
+      await subscribeNewsletter(newsletter);
+    }
+  };
+
   return (
     <footer className="bg-slate-900 text-white py-12">
       <div className="container mx-auto px-4">
@@ -1536,9 +2010,11 @@ const Footer = () => {
               Há mais de uma década transformando lares com móveis de qualidade premium. 
               Design exclusivo, conforto incomparável e durabilidade garantida.
             </p>
-            <p className="text-slate-400 text-sm">
-              CNPJ: 12.345.678/0001-90 | Estofados Premium Outlet Ltda.
-            </p>
+            <div className="text-slate-400 text-sm space-y-1">
+              <p>CNPJ: 12.345.678/0001-90</p>
+              <p>Estofados Premium Outlet Ltda.</p>
+              <p>Rua das Flores, 123 - Copacabana, RJ</p>
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -1553,23 +2029,28 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact Info */}
+          {/* Newsletter */}
           <div>
-            <h4 className="font-semibold text-amber-400 mb-4">Contato</h4>
-            <div className="space-y-2 text-slate-300">
-              <p className="flex items-center">
-                <Phone size={16} className="mr-2" />
-                (21) 99619-7768
-              </p>
-              <p className="flex items-center">
-                <Mail size={16} className="mr-2" />
-                contato@estofadospremium.com.br
-              </p>
-              <p className="flex items-center">
-                <MapPin size={16} className="mr-2" />
-                Rio de Janeiro, RJ
-              </p>
-            </div>
+            <h4 className="font-semibold text-amber-400 mb-4">Newsletter</h4>
+            <p className="text-slate-300 text-sm mb-4">
+              Receba ofertas exclusivas e novidades
+            </p>
+            <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+              <input
+                type="email"
+                placeholder="Seu email"
+                value={newsletter}
+                onChange={(e) => setNewsletter(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded text-white placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded font-semibold transition-colors disabled:opacity-50"
+              >
+                {isLoading ? 'Enviando...' : 'Inscrever'}
+              </button>
+            </form>
           </div>
         </div>
 
@@ -1594,12 +2075,13 @@ const Footer = () => {
   );
 };
 
-// Main HomePage Component
+// Main Home Component
 const HomePage = () => {
   return (
     <div className="min-h-screen">
       <HeroSection />
       <CategoriesSection />
+      <TrustBadgesSection />
       <TestimonialsSection />
       <BackToTop />
     </div>
@@ -1618,26 +2100,15 @@ function App() {
             <Route path="/produto/:id" element={<ProductDetailPage />} />
             <Route path="/sobre" element={<AboutPage />} />
             <Route path="/contato" element={<ContactPage />} />
-            {/* Institutional Pages - Simple placeholders for now */}
-            <Route path="/faq" element={
-              <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
-                  <HelpCircle className="mx-auto mb-4 text-amber-500" size={64} />
-                  <h1 className="text-3xl font-bold text-slate-800 mb-4">FAQ - Em Breve</h1>
-                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
-                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
-                    Voltar ao Início
-                  </Link>
-                </div>
-              </div>
-            } />
+            <Route path="/faq" element={<FAQPage />} />
+            {/* Institutional Pages */}
             <Route path="/politica-privacidade" element={
               <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
+                <div className="text-center max-w-2xl mx-auto p-8">
                   <Lock className="mx-auto mb-4 text-amber-500" size={64} />
-                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Privacidade - Em Breve</h1>
-                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
-                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Privacidade</h1>
+                  <p className="text-slate-600 mb-6">Esta página estará disponível em breve com nossa política completa de privacidade e proteção de dados.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium">
                     Voltar ao Início
                   </Link>
                 </div>
@@ -1645,11 +2116,11 @@ function App() {
             } />
             <Route path="/termos-uso" element={
               <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
+                <div className="text-center max-w-2xl mx-auto p-8">
                   <FileText className="mx-auto mb-4 text-amber-500" size={64} />
-                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Termos de Uso - Em Breve</h1>
-                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
-                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Termos de Uso</h1>
+                  <p className="text-slate-600 mb-6">Esta página estará disponível em breve com nossos termos completos de uso da plataforma.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium">
                     Voltar ao Início
                   </Link>
                 </div>
@@ -1657,11 +2128,11 @@ function App() {
             } />
             <Route path="/politica-troca" element={
               <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-                <div className="text-center">
+                <div className="text-center max-w-2xl mx-auto p-8">
                   <RotateCcw className="mx-auto mb-4 text-amber-500" size={64} />
-                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Troca - Em Breve</h1>
-                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
-                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Troca e Devolução</h1>
+                  <p className="text-slate-600 mb-6">Esta página estará disponível em breve com nossa política completa de trocas e devoluções.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium">
                     Voltar ao Início
                   </Link>
                 </div>
@@ -1669,6 +2140,8 @@ function App() {
             } />
           </Routes>
           <Footer />
+          <WhatsAppFloat />
+          <NewsletterPopup />
           <Toaster position="top-right" richColors />
         </BrowserRouter>
       </div>
