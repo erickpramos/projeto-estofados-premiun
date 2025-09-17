@@ -362,15 +362,54 @@ const BackToTop = () => {
   );
 };
 
-// WhatsApp Floating Button
+// WhatsApp Floating Button - VERSÃO CORRIGIDA
 const WhatsAppFloat = () => {
-  const { openWhatsApp } = useAppContext();
+  const handleWhatsAppClick = () => {
+    const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.");
+    
+    // Múltiplas tentativas para garantir funcionamento
+    const urls = [
+      `https://api.whatsapp.com/send?phone=5521996197768&text=${message}`,
+      `https://wa.me/5521996197768?text=${message}`,
+      `whatsapp://send?phone=5521996197768&text=${message}`
+    ];
+    
+    // Tenta a primeira URL
+    let opened = false;
+    
+    try {
+      // Método mais confiável
+      const whatsappUrl = `https://wa.me/5521996197768?text=${message}`;
+      const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+      
+      if (newWindow) {
+        opened = true;
+        console.log('WhatsApp aberto com sucesso:', whatsappUrl);
+      }
+    } catch (error) {
+      console.error('Erro ao abrir WhatsApp:', error);
+    }
+    
+    // Se não abriu, tenta método alternativo
+    if (!opened) {
+      try {
+        window.location.href = `https://wa.me/5521996197768?text=${message}`;
+      } catch (error) {
+        console.error('Erro no método alternativo:', error);
+        // Último recurso - copia número
+        navigator.clipboard.writeText('21996197768').then(() => {
+          alert('Número copiado: 21996197768\nAbra o WhatsApp e cole o número!');
+        });
+      }
+    }
+  };
 
   return (
     <button
-      onClick={openWhatsApp}
-      className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition-all z-50 animate-pulse hover:animate-none"
+      onClick={handleWhatsAppClick}
+      className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition-all z-50 animate-pulse hover:animate-none hover:scale-110"
       aria-label="Falar no WhatsApp"
+      title="Clique para falar no WhatsApp"
     >
       <MessageCircle size={24} />
     </button>
