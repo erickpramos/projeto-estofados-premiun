@@ -341,10 +341,10 @@ async def shutdown_db_client():
 
 async def initialize_data():
     """Initialize categories, products and reviews if they don't exist"""
-    # Check if data already exists
-    existing_categories = await db.categories.count_documents({})
-    if existing_categories > 0:
-        return
+    # FORCE UPDATE - Clear existing categories first
+    await db.categories.delete_many({})
+    await db.products.delete_many({})
+    await db.reviews.delete_many({})
     
     # Updated categories with CORRECTED names and images
     categories_data = [
