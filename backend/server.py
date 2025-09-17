@@ -570,3 +570,15 @@ async def initialize_data():
     for review_data in reviews_data:
         review = Review(**review_data)
         await db.reviews.insert_one(review.dict())
+    
+    # CREATE ADMIN USER FOR OWNER
+    admin_user = {
+        "id": str(uuid.uuid4()),
+        "name": "Admin Estofados",
+        "email": "admin@estofados.com",
+        "password": get_password_hash("admin123"),
+        "phone": "21996197768",
+        "created_at": datetime.now(timezone.utc),
+        "is_admin": True
+    }
+    await db.users.insert_one(admin_user)
