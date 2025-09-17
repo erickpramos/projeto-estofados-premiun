@@ -508,42 +508,63 @@ async def initialize_data():
         product = Product(**prod_data)
         await db.products.insert_one(product.dict())
     
-    # Sample reviews with real people images - gender matched
+    # Sample reviews with real people images - gender correctly matched
     reviews_data = [
         {
             "user_name": "Mariana Silva",
             "user_location": "Copacabana, RJ",
             "rating": 5,
             "comment": "Excelente qualidade! O sofá chegou no prazo e superou minhas expectativas. Recomendo!",
-            "user_image": "https://images.unsplash.com/photo-1720098110121-26aa70b87bfc"
+            "user_image": "https://images.unsplash.com/photo-1720098110121-26aa70b87bfc"  # Mulher
         },
         {
             "user_name": "Carlos Mendes",
             "user_location": "Barra da Tijuca, RJ",
             "rating": 5,
             "comment": "Atendimento excepcional e produtos de primeira qualidade. Muito satisfeito!",
-            "user_image": "https://images.unsplash.com/photo-1717068342949-d596a0352889"
+            "user_image": "https://images.unsplash.com/photo-1717068342949-d596a0352889"  # Homem
         },
         {
             "user_name": "Ana Paula",
             "user_location": "Ipanema, RJ",
             "rating": 5,
             "comment": "A poltrona ficou perfeita na minha sala. Conforto e elegância em um só produto!",
-            "user_image": "https://images.pexels.com/photos/2019926/pexels-photo-2019926.jpeg"
+            "user_image": "https://images.pexels.com/photos/2019926/pexels-photo-2019926.jpeg"  # Mulher
         },
         {
             "user_name": "Roberto Lima",
             "user_location": "Tijuca, RJ",
             "rating": 4,
             "comment": "Ótima experiência de compra. Móveis de qualidade e entrega rápida.",
-            "user_image": "https://images.pexels.com/photos/9957954/pexels-photo-9957954.jpeg"
+            "user_image": "https://images.pexels.com/photos/9957954/pexels-photo-9957954.jpeg"  # Homem
         },
         {
             "user_name": "Julia Santos",
             "user_location": "Leblon, RJ",
             "rating": 5,
             "comment": "Amei meu novo sofá! Design moderno e muito confortável. Recomendo a todos!",
-            "user_image": "https://images.unsplash.com/photo-1753161021289-1373415244b1"
+            "user_image": "https://images.unsplash.com/photo-1753161021289-1373415244b1"  # Mulher
+        },
+        {
+            "user_name": "Pedro Costa",
+            "user_location": "Flamengo, RJ",
+            "rating": 5,
+            "comment": "Comprei uma mesa industrial e ficou perfeita no meu escritório. Qualidade excepcional!",
+            "user_image": "https://images.pexels.com/photos/33900112/pexels-photo-33900112.jpeg"  # Homem
+        },
+        {
+            "user_name": "Fernanda Oliveira",
+            "user_location": "Botafogo, RJ",
+            "rating": 5,
+            "comment": "Atendimento personalizado e produtos lindos. Transformaram minha sala completamente!",
+            "user_image": "https://images.pexels.com/photos/33901773/pexels-photo-33901773.jpeg"  # Mulher
+        },
+        {
+            "user_name": "Ricardo Alves",
+            "user_location": "Recreio, RJ",
+            "rating": 4,
+            "comment": "Boa qualidade e preço justo. Recomendo para quem busca móveis diferenciados.",
+            "user_image": "https://images.unsplash.com/photo-1753161023792-d240af5e6ef7"  # Homem
         }
     ]
     
