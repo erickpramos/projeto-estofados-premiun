@@ -735,19 +735,33 @@ const HeroSection = () => {
             com design sofisticado e qualidade incomparável.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <a
-              href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Quero%20conhecer%20mais%20sobre%20os%20produtos%20premium%20da%20Estofados%20Premium%20Outlet!"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
-                         text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
-                         transition-all transform hover:scale-110 shadow-xl hover:shadow-2xl"
-            >
-              <MessageCircle size={24} />
-              <span>Fale Conosco no WhatsApp</span>
-              <ArrowRight size={20} />
-            </a>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              {/* Botão WhatsApp com múltiplas opções de teste */}
+              <div className="flex flex-col gap-2">
+                <a
+                  href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Quero%20conhecer%20mais%20sobre%20os%20produtos%20premium%20da%20Estofados%20Premium%20Outlet!"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
+                             text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
+                             transition-all transform hover:scale-110 shadow-xl hover:shadow-2xl"
+                >
+                  <MessageCircle size={24} />
+                  <span>Fale Conosco no WhatsApp</span>
+                  <ArrowRight size={20} />
+                </a>
+                
+                {/* Botão de teste alternativo */}
+                <button
+                  onClick={() => {
+                    alert('Testando! Vai abrir WhatsApp...');
+                    window.open('https://wa.me/5521996197768', '_blank');
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm"
+                >
+                  🔧 TESTE ALTERNATIVO
+                </button>
+              </div>
             
             <Link
               to="/produtos"
