@@ -1010,9 +1010,10 @@ const CartModal = ({ onClose }) => {
       `• ${item.product_name} (${item.quantity}x)`
     ).join('\n');
     
-    const message = `🛒 *Finalizar Compra - Estofados Premium*\n\n*Produtos selecionados:*\n${items}\n\n*Total de itens:* ${cart.items.reduce((total, item) => total + item.quantity, 0)}\n\nGostaria de finalizar esta compra e saber sobre formas de pagamento e prazo de entrega.`;
+    const message = encodeURIComponent(`🛒 *Finalizar Compra - Estofados Premium*\n\n*Produtos selecionados:*\n${items}\n\n*Total de itens:* ${cart.items.reduce((total, item) => total + item.quantity, 0)}\n\nGostaria de finalizar esta compra e saber sobre formas de pagamento e prazo de entrega.`);
     
-    openWhatsApp(message);
+    const url = `https://wa.me/5521996197768?text=${message}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
