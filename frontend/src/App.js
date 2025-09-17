@@ -1594,8 +1594,8 @@ const Footer = () => {
   );
 };
 
-// Main Home Component
-const Home = () => {
+// Main HomePage Component
+const HomePage = () => {
   return (
     <div className="min-h-screen">
       <HeroSection />
