@@ -346,42 +346,36 @@ async def initialize_data():
     if existing_categories > 0:
         return
     
-    # Categories with images
+    # Updated categories - REMOVED recamiers, UPDATED descriptions
     categories_data = [
         {
-            "name": "Sofás",
+            "name": "Sofás & Sofás Booth",
             "slug": "sofas",
-            "description": "Sofás modernos e confortáveis para sua sala",
-            "image_url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc"
+            "description": "Sofás modernos, de canto e sofás booth para restaurantes",
+            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac"  # Booth sofa image
         },
         {
-            "name": "Poltronas",
+            "name": "Poltronas Premium",
             "slug": "poltronas",
-            "description": "Poltronas decorativas e confortáveis",
+            "description": "Poltronas decorativas e giratórias de luxo",
             "image_url": "https://images.unsplash.com/photo-1718049719688-764249c6800d"
         },
         {
-            "name": "Almofadas",
+            "name": "Almofadas Decorativas",
             "slug": "almofadas",
-            "description": "Almofadas decorativas para todos os ambientes",
+            "description": "Almofadas elegantes para todos os ambientes",
             "image_url": "https://images.unsplash.com/photo-1553114552-c4ece3a33c93"
         },
         {
-            "name": "Puffs",
+            "name": "Puffs Modernos",
             "slug": "puffs",
-            "description": "Puffs redondos e quadrados para decoração",
-            "image_url": "https://images.unsplash.com/photo-1503278034495-2865fce44a95"
-        },
-        {
-            "name": "Recamiers",
-            "slug": "recamiers",
-            "description": "Recamiers elegantes para quarto e sala",
-            "image_url": "https://images.unsplash.com/photo-1733472107207-547dc85e1d31"
+            "description": "Puffs redondos e quadrados em diversos materiais",
+            "image_url": "https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg"  # Non-knitted puff
         },
         {
             "name": "Móveis Industriais",
             "slug": "moveis-industriais",
-            "description": "Móveis industriais de ferro e madeira",
+            "description": "Móveis industriais de ferro e madeira, mesas e estantes",
             "image_url": "https://images.unsplash.com/photo-1682718619781-252f23e21132"
         }
     ]
@@ -395,9 +389,9 @@ async def initialize_data():
     categories = await db.categories.find().to_list(length=None)
     category_map = {cat["slug"]: cat for cat in categories}
     
-    # Products with real images
+    # Updated products
     products_data = [
-        # Sofás
+        # Sofás & Booth
         {
             "name": "Sofá Moderno Verde",
             "description": "Sofá moderno de 3 lugares em tecido verde com pés de madeira",
@@ -409,23 +403,23 @@ async def initialize_data():
             "in_stock": True
         },
         {
-            "name": "Sofá Cinza com Almofadas",
-            "description": "Sofá moderno cinza com almofadas decorativas incluídas",
-            "price": 3299.90,
+            "name": "Sofá Booth para Restaurante",
+            "description": "Sofá booth clássico ideal para restaurantes e cafeterias",
+            "price": 3899.90,
             "category_id": category_map["sofas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e",
-            "images": ["https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e"],
-            "specifications": {"lugares": "3", "material": "Tecido", "cor": "Cinza"},
+            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac",
+            "images": ["https://images.unsplash.com/photo-1549800076-831d7a97afac"],
+            "specifications": {"lugares": "4", "material": "Courino", "cor": "Marrom", "tipo": "Booth"},
             "in_stock": True
         },
         {
-            "name": "Sofá Branco Clean",
-            "description": "Sofá moderno branco minimalista para ambientes clean",
-            "price": 2899.90,
+            "name": "Sofá de Canto Modular",
+            "description": "Sofá modular de canto que se adapta ao seu espaço",
+            "price": 4299.90,
             "category_id": category_map["sofas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1603192399946-8bbb0703cfc4",
-            "images": ["https://images.unsplash.com/photo-1603192399946-8bbb0703cfc4"],
-            "specifications": {"lugares": "2", "material": "Courino", "cor": "Branco"},
+            "image_url": "https://images.unsplash.com/photo-1757416654883-c73c67b3382b",
+            "images": ["https://images.unsplash.com/photo-1757416654883-c73c67b3382b"],
+            "specifications": {"lugares": "5", "material": "Tecido", "cor": "Marrom", "tipo": "Modular"},
             "in_stock": True
         },
         
@@ -441,13 +435,13 @@ async def initialize_data():
             "in_stock": True
         },
         {
-            "name": "Poltrona Couro Marrom",
-            "description": "Poltrona decorativa em couro marrom com detalhes elegantes",
-            "price": 2199.90,
+            "name": "Poltrona Giratória Premium",
+            "description": "Poltrona giratória em couro com base giratória",
+            "price": 2599.90,
             "category_id": category_map["poltronas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1601366533287-5ee4c763ae4e",
-            "images": ["https://images.unsplash.com/photo-1601366533287-5ee4c763ae4e"],
-            "specifications": {"material": "Couro", "cor": "Marrom", "estilo": "Clássico"},
+            "image_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7",
+            "images": ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7"],
+            "specifications": {"material": "Couro", "cor": "Amarelo", "estilo": "Giratória"},
             "in_stock": True
         },
         
@@ -463,27 +457,15 @@ async def initialize_data():
             "in_stock": True
         },
         
-        # Puffs
+        # Puffs (SEM tricô)
         {
-            "name": "Puff Tricotado",
-            "description": "Puff redondo tricotado para sala ou quarto",
+            "name": "Puff Redondo Moderno",
+            "description": "Puff redondo em tecido liso para sala ou quarto",
             "price": 399.90,
             "category_id": category_map["puffs"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1503278034495-2865fce44a95",
-            "images": ["https://images.unsplash.com/photo-1503278034495-2865fce44a95"],
-            "specifications": {"formato": "Redondo", "material": "Tricô", "cor": "Bege"},
-            "in_stock": True
-        },
-        
-        # Recamiers
-        {
-            "name": "Recamier Colorido",
-            "description": "Recamier para quarto com tecido colorido e design moderno",
-            "price": 1599.90,
-            "category_id": category_map["recamiers"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1733472107207-547dc85e1d31",
-            "images": ["https://images.unsplash.com/photo-1733472107207-547dc85e1d31"],
-            "specifications": {"lugares": "1", "material": "Tecido", "estilo": "Moderno"},
+            "image_url": "https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg",
+            "images": ["https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg"],
+            "specifications": {"formato": "Redondo", "material": "Tecido", "cor": "Cinza"},
             "in_stock": True
         },
         
@@ -497,6 +479,16 @@ async def initialize_data():
             "images": ["https://images.unsplash.com/photo-1593022445207-836cf2396054"],
             "specifications": {"material": "Ferro e Madeira", "lugares": "6", "estilo": "Industrial"},
             "in_stock": True
+        },
+        {
+            "name": "Estante Industrial",
+            "description": "Estante industrial de ferro e madeira para decoração",
+            "price": 1299.90,
+            "category_id": category_map["moveis-industriais"]["id"],
+            "image_url": "https://images.unsplash.com/photo-1682718619781-252f23e21132",
+            "images": ["https://images.unsplash.com/photo-1682718619781-252f23e21132"],
+            "specifications": {"material": "Ferro e Madeira", "prateleiras": "4", "estilo": "Industrial"},
+            "in_stock": True
         }
     ]
     
@@ -508,63 +500,63 @@ async def initialize_data():
         product = Product(**prod_data)
         await db.products.insert_one(product.dict())
     
-    # Sample reviews with real people images - gender correctly matched
+    # CORRECTED reviews with matching gender photos
     reviews_data = [
         {
-            "user_name": "Mariana Silva",
+            "user_name": "Mariana Silva",  # FEMININO
             "user_location": "Copacabana, RJ",
             "rating": 5,
             "comment": "Excelente qualidade! O sofá chegou no prazo e superou minhas expectativas. Recomendo!",
-            "user_image": "https://images.unsplash.com/photo-1720098110121-26aa70b87bfc"  # Mulher
+            "user_image": "https://images.unsplash.com/photo-1494790108755-2616b612b786"  # MULHER
         },
         {
-            "user_name": "Carlos Mendes",
+            "user_name": "Carlos Mendes",  # MASCULINO
             "user_location": "Barra da Tijuca, RJ",
             "rating": 5,
             "comment": "Atendimento excepcional e produtos de primeira qualidade. Muito satisfeito!",
-            "user_image": "https://images.unsplash.com/photo-1717068342949-d596a0352889"  # Homem
+            "user_image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"  # HOMEM
         },
         {
-            "user_name": "Ana Paula",
+            "user_name": "Ana Paula Santos",  # FEMININO
             "user_location": "Ipanema, RJ",
             "rating": 5,
             "comment": "A poltrona ficou perfeita na minha sala. Conforto e elegância em um só produto!",
-            "user_image": "https://images.pexels.com/photos/2019926/pexels-photo-2019926.jpeg"  # Mulher
+            "user_image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"  # MULHER
         },
         {
-            "user_name": "Roberto Lima",
+            "user_name": "Roberto Lima",  # MASCULINO
             "user_location": "Tijuca, RJ",
             "rating": 4,
             "comment": "Ótima experiência de compra. Móveis de qualidade e entrega rápida.",
-            "user_image": "https://images.pexels.com/photos/9957954/pexels-photo-9957954.jpeg"  # Homem
+            "user_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"  # HOMEM
         },
         {
-            "user_name": "Julia Santos",
+            "user_name": "Julia Costa",  # FEMININO
             "user_location": "Leblon, RJ",
             "rating": 5,
             "comment": "Amei meu novo sofá! Design moderno e muito confortável. Recomendo a todos!",
-            "user_image": "https://images.unsplash.com/photo-1753161021289-1373415244b1"  # Mulher
+            "user_image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2"  # MULHER
         },
         {
-            "user_name": "Pedro Costa",
+            "user_name": "Pedro Oliveira",  # MASCULINO
             "user_location": "Flamengo, RJ",
             "rating": 5,
             "comment": "Comprei uma mesa industrial e ficou perfeita no meu escritório. Qualidade excepcional!",
-            "user_image": "https://images.pexels.com/photos/33900112/pexels-photo-33900112.jpeg"  # Homem
+            "user_image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"  # HOMEM
         },
         {
-            "user_name": "Fernanda Oliveira",
+            "user_name": "Fernanda Alves",  # FEMININO
             "user_location": "Botafogo, RJ",
             "rating": 5,
             "comment": "Atendimento personalizado e produtos lindos. Transformaram minha sala completamente!",
-            "user_image": "https://images.pexels.com/photos/33901773/pexels-photo-33901773.jpeg"  # Mulher
+            "user_image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb"  # MULHER
         },
         {
-            "user_name": "Ricardo Alves",
+            "user_name": "Ricardo Santos",  # MASCULINO
             "user_location": "Recreio, RJ",
             "rating": 4,
             "comment": "Boa qualidade e preço justo. Recomendo para quem busca móveis diferenciados.",
-            "user_image": "https://images.unsplash.com/photo-1753161023792-d240af5e6ef7"  # Homem
+            "user_image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"  # HOMEM
         }
     ]
     
