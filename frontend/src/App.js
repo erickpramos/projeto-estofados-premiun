@@ -535,9 +535,13 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center space-x-4">
-              {/* WhatsApp Button - FIXED */}
+              {/* WhatsApp Button - VERSÃO CORRIGIDA */}
               <button
-                onClick={() => openWhatsApp()}
+                onClick={() => {
+                  const message = encodeURIComponent("Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.");
+                  const url = `https://wa.me/5521996197768?text=${message}`;
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
                 className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-all transform hover:scale-105 shadow-lg"
               >
                 <MessageCircle size={20} />
