@@ -648,8 +648,9 @@ const ProductCard = ({ product }) => {
   const { addToCart, openWhatsApp } = useAppContext();
 
   const handleWhatsApp = () => {
-    const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações sobre disponibilidade, detalhes e condições de pagamento.`;
-    openWhatsApp(message);
+    const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações sobre disponibilidade, detalhes e condições de pagamento.`);
+    const url = `https://wa.me/5521996197768?text=${message}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   return (
