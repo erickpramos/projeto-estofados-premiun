@@ -1037,14 +1037,16 @@ const CartModal = ({ onClose }) => {
                 🚚 Frete GRÁTIS para compras acima de R$ 1.500!
               </p>
             </div>
-            <button
-              onClick={handleWhatsAppCheckout}
+            <a
+              href={`https://wa.me/5521996197768?text=${encodeURIComponent('🛒 Finalizar Compra - Estofados Premium\n\nProdutos selecionados:\n' + cart.items.map(item => `• ${item.product_name} (${item.quantity}x)`).join('\n') + '\n\nTotal de itens: ' + cart.items.reduce((total, item) => total + item.quantity, 0) + '\n\nGostaria de finalizar esta compra e saber sobre formas de pagamento e prazo de entrega.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-4 rounded-lg 
                          flex items-center justify-center space-x-3 transition-all transform hover:scale-105 shadow-lg"
             >
               <MessageCircle size={24} />
               <span>Finalizar no WhatsApp</span>
-            </button>
+            </a>
             <p className="text-xs text-slate-500 text-center mt-2">
               ✅ Enviaremos seus produtos via WhatsApp para finalizar a compra
             </p>
