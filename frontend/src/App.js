@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { Toaster } from "./components/ui/sonner";
 import { toast } from "sonner";
@@ -25,7 +25,26 @@ import {
   Heart,
   Shield,
   Truck,
-  Award
+  Award,
+  Search,
+  Filter,
+  ChevronRight,
+  ChevronLeft,
+  ArrowUp,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  FileText,
+  Building,
+  Users,
+  Target,
+  Zap,
+  Home,
+  Package,
+  HelpCircle,
+  Lock,
+  RotateCcw,
+  Info
 } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -51,6 +70,14 @@ const AppProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedFilters, setSelectedFilters] = useState({
+    category: 'all',
+    material: 'all',
+    color: 'all',
+    environment: 'all'
+  });
+  const [sortBy, setSortBy] = useState('name');
 
   const api = axios.create({
     baseURL: API,
@@ -170,6 +197,27 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  // Filter and search products
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesCategory = selectedFilters.category === 'all' || product.category_id === selectedFilters.category;
+    
+    return matchesSearch && matchesCategory;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'newest':
+        return new Date(b.created_at) - new Date(a.created_at);
+      case 'popular':
+        return Math.random() - 0.5; // Random for demo
+      default:
+        return 0;
+    }
+  });
+
   useEffect(() => {
     loadData();
   }, []);
@@ -190,6 +238,13 @@ const AppProvider = ({ children }) => {
     products,
     reviews,
     isLoading,
+    searchTerm,
+    setSearchTerm,
+    selectedFilters,
+    setSelectedFilters,
+    sortBy,
+    setSortBy,
+    filteredProducts,
     login,
     register,
     logout,
@@ -205,9 +260,52 @@ const AppProvider = ({ children }) => {
   );
 };
 
-// Header Component
+// Loading Component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center py-8">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+  </div>
+);
+
+// Back to Top Button
+const BackToTop = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.pageYOffset > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <button
+      onClick={scrollToTop}
+      className="fixed bottom-20 right-6 bg-amber-500 hover:bg-amber-600 text-white p-3 rounded-full shadow-lg transition-all z-40"
+    >
+      <ArrowUp size={20} />
+    </button>
+  );
+};
+
+// Header Component with Search
 const Header = () => {
-  const { user, cart, logout } = useAppContext();
+  const { user, cart, logout, searchTerm, setSearchTerm } = useAppContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
@@ -223,7 +321,7 @@ const Header = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <div className="flex items-center space-x-3">
+            <Link to="/" className="flex items-center space-x-3">
               <img 
                 src="https://customer-assets.emergentagent.com/job_sofa-boutique-1/artifacts/fts1vd80_Design_sem_nome-removebg-preview.png" 
                 alt="Estofados Premium Outlet" 
@@ -233,15 +331,29 @@ const Header = () => {
                 <h1 className="text-xl font-bold text-amber-400">ESTOFADOS</h1>
                 <p className="text-sm text-slate-300">PREMIUM OUTLET</p>
               </div>
+            </Link>
+
+            {/* Search Bar */}
+            <div className="hidden lg:flex flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Buscar produtos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                />
+              </div>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              <a href="#home" className="hover:text-amber-400 transition-colors">Início</a>
-              <a href="#products" className="hover:text-amber-400 transition-colors">Produtos</a>
-              <a href="#about" className="hover:text-amber-400 transition-colors">Sobre</a>
+              <Link to="/" className="hover:text-amber-400 transition-colors">Início</Link>
+              <Link to="/produtos" className="hover:text-amber-400 transition-colors">Produtos</Link>
+              <Link to="/sobre" className="hover:text-amber-400 transition-colors">Sobre</Link>
               <a href="#testimonials" className="hover:text-amber-400 transition-colors">Depoimentos</a>
-              <a href="#contact" className="hover:text-amber-400 transition-colors">Contato</a>
+              <Link to="/contato" className="hover:text-amber-400 transition-colors">Contato</Link>
             </nav>
 
             {/* Actions */}
@@ -292,12 +404,26 @@ const Header = () => {
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="lg:hidden py-4 border-t border-slate-700">
+              {/* Mobile Search */}
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+                  <input
+                    type="text"
+                    placeholder="Buscar produtos..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              
               <nav className="flex flex-col space-y-4">
-                <a href="#home" className="hover:text-amber-400 transition-colors">Início</a>
-                <a href="#products" className="hover:text-amber-400 transition-colors">Produtos</a>
-                <a href="#about" className="hover:text-amber-400 transition-colors">Sobre</a>
+                <Link to="/" className="hover:text-amber-400 transition-colors">Início</Link>
+                <Link to="/produtos" className="hover:text-amber-400 transition-colors">Produtos</Link>
+                <Link to="/sobre" className="hover:text-amber-400 transition-colors">Sobre</Link>
                 <a href="#testimonials" className="hover:text-amber-400 transition-colors">Depoimentos</a>
-                <a href="#contact" className="hover:text-amber-400 transition-colors">Contato</a>
+                <Link to="/contato" className="hover:text-amber-400 transition-colors">Contato</Link>
               </nav>
             </div>
           )}
@@ -310,6 +436,100 @@ const Header = () => {
       {/* Auth Modal */}
       {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </>
+  );
+};
+
+// Breadcrumb Component
+const Breadcrumb = ({ items }) => {
+  return (
+    <nav className="flex items-center space-x-2 text-sm text-slate-600 mb-6">
+      <Link to="/" className="hover:text-amber-600">
+        <Home size={16} />
+      </Link>
+      {items.map((item, index) => (
+        <React.Fragment key={index}>
+          <ChevronRight size={16} />
+          {item.href ? (
+            <Link to={item.href} className="hover:text-amber-600">
+              {item.label}
+            </Link>
+          ) : (
+            <span className="text-slate-800 font-medium">{item.label}</span>
+          )}
+        </React.Fragment>
+      ))}
+    </nav>
+  );
+};
+
+// Product Card Component
+const ProductCard = ({ product }) => {
+  const { addToCart } = useAppContext();
+
+  const openWhatsApp = () => {
+    const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações.`;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
+
+  return (
+    <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:scale-105">
+      <div className="relative overflow-hidden">
+        <Link to={`/produto/${product.id}`}>
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
+          />
+        </Link>
+        <div className="absolute top-4 right-4">
+          <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            {product.category_name}
+          </span>
+        </div>
+        {!product.in_stock && (
+          <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
+            <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
+              Indisponível
+            </span>
+          </div>
+        )}
+      </div>
+
+      <div className="p-6">
+        <Link to={`/produto/${product.id}`}>
+          <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-amber-600 transition-colors">
+            {product.name}
+          </h3>
+        </Link>
+        <p className="text-slate-600 mb-4 line-clamp-2">
+          {product.description}
+        </p>
+        
+        <div className="flex items-center justify-end mb-4">
+          <button className="text-slate-400 hover:text-red-500 transition-colors">
+            <Heart size={24} />
+          </button>
+        </div>
+
+        <div className="flex space-x-2">
+          <button
+            onClick={() => addToCart(product.id)}
+            disabled={!product.in_stock}
+            className="flex-1 bg-slate-800 hover:bg-slate-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+          >
+            <ShoppingCart size={18} />
+            <span>Carrinho</span>
+          </button>
+          <button
+            onClick={openWhatsApp}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+          >
+            <MessageCircle size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -379,13 +599,13 @@ const HeroSection = () => {
               <ArrowRight size={20} />
             </button>
             
-            <a
-              href="#products"
+            <Link
+              to="/produtos"
               className="border-2 border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900 
                          font-bold px-8 py-4 rounded-full transition-all transform hover:scale-105"
             >
               Ver Produtos
-            </a>
+            </Link>
           </div>
 
           {/* Features */}
@@ -440,8 +660,9 @@ const CategoriesSection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category) => (
-            <div
+            <Link
               key={category.id}
+              to={`/produtos?categoria=${category.id}`}
               className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105"
             >
               <div className="aspect-w-16 aspect-h-12 relative">
@@ -460,17 +681,12 @@ const CategoriesSection = () => {
                 <p className="text-slate-200 mb-4">
                   {category.description}
                 </p>
-                <button
-                  onClick={() => {
-                    document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
-                >
+                <div className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2 w-fit">
                   <span>Ver Produtos</span>
                   <ArrowRight size={16} />
-                </button>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -478,134 +694,530 @@ const CategoriesSection = () => {
   );
 };
 
-// Products Section
-const ProductsSection = () => {
-  const { products, categories, addToCart } = useAppContext();
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [filteredProducts, setFilteredProducts] = useState([]);
+// Products Page Component
+const ProductsPage = () => {
+  const { 
+    categories, 
+    filteredProducts, 
+    isLoading, 
+    selectedFilters, 
+    setSelectedFilters, 
+    sortBy, 
+    setSortBy 
+  } = useAppContext();
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'Produtos' }]} />
+        
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar */}
+          <div className="lg:w-1/4">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
+              <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                <Filter className="mr-2" size={20} />
+                Filtros
+              </h3>
+              
+              {/* Category Filter */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Categoria
+                </label>
+                <select
+                  value={selectedFilters.category}
+                  onChange={(e) => setSelectedFilters({...selectedFilters, category: e.target.value})}
+                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                >
+                  <option value="all">Todas as categorias</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Ordenar por
+                </label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                >
+                  <option value="name">Nome A-Z</option>
+                  <option value="newest">Mais recentes</option>
+                  <option value="popular">Mais populares</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          <div className="lg:w-3/4">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold text-slate-800">
+                Nossos Produtos
+              </h1>
+              <p className="text-slate-600">
+                {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+
+            {isLoading ? (
+              <LoadingSpinner />
+            ) : filteredProducts.length === 0 ? (
+              <div className="text-center py-12">
+                <Package className="mx-auto mb-4 text-slate-400" size={64} />
+                <h3 className="text-xl font-semibold text-slate-600 mb-2">
+                  Nenhum produto encontrado
+                </h3>
+                <p className="text-slate-500">
+                  Tente ajustar os filtros ou termo de busca
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Product Detail Page
+const ProductDetailPage = () => {
+  const { id } = useParams();
+  const { products, addToCart, categories } = useAppContext();
+  const [product, setProduct] = useState(null);
+  const [currentImage, setCurrentImage] = useState(0);
 
   useEffect(() => {
-    if (selectedCategory === 'all') {
-      setFilteredProducts(products);
-    } else {
-      setFilteredProducts(products.filter(p => p.category_id === selectedCategory));
-    }
-  }, [selectedCategory, products]);
+    const foundProduct = products.find(p => p.id === id);
+    setProduct(foundProduct);
+  }, [id, products]);
 
-  const openWhatsApp = (product) => {
-    const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações.`;
+  const openWhatsApp = () => {
+    if (!product) return;
+    const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações sobre especificações, disponibilidade e formas de pagamento.`;
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
 
-  return (
-    <section id="products" className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-slate-800 mb-4">
-            Nossos <span className="text-amber-600">Produtos</span>
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-8">
-            Móveis premium com design exclusivo e qualidade superior
-          </p>
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-          {/* Category Filters */}
-          <div className="flex flex-wrap justify-center gap-4 mb-8">
-            <button
-              onClick={() => setSelectedCategory('all')}
-              className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                selectedCategory === 'all'
-                  ? 'bg-amber-500 text-white shadow-lg'
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-              }`}
-            >
-              Todos
-            </button>
-            {categories.map((category) => (
+  const images = product.images.length > 0 ? product.images : [product.image_url];
+  const relatedProducts = products.filter(p => 
+    p.category_id === product.category_id && p.id !== product.id
+  ).slice(0, 4);
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[
+          { label: 'Produtos', href: '/produtos' },
+          { label: product.category_name, href: `/produtos?categoria=${product.category_id}` },
+          { label: product.name }
+        ]} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          {/* Product Images */}
+          <div>
+            <div className="mb-4">
+              <img
+                src={images[currentImage]}
+                alt={product.name}
+                className="w-full h-96 object-cover rounded-lg shadow-lg"
+              />
+            </div>
+            {images.length > 1 && (
+              <div className="flex space-x-2">
+                {images.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImage(index)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden ${
+                      currentImage === index ? 'ring-2 ring-amber-500' : ''
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Product Info */}
+          <div>
+            <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-semibold mb-4 inline-block">
+              {product.category_name}
+            </span>
+            
+            <h1 className="text-4xl font-bold text-slate-800 mb-4">
+              {product.name}
+            </h1>
+            
+            <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+              {product.description}
+            </p>
+
+            {/* Specifications */}
+            {Object.keys(product.specifications).length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-slate-800 mb-4">
+                  Especificações
+                </h3>
+                <div className="bg-white rounded-lg p-4 shadow-md">
+                  {Object.entries(product.specifications).map(([key, value]) => (
+                    <div key={key} className="flex justify-between py-2 border-b border-slate-200 last:border-b-0">
+                      <span className="font-medium text-slate-700 capitalize">
+                        {key}:
+                      </span>
+                      <span className="text-slate-600">{value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Stock Status */}
+            <div className="flex items-center mb-8">
+              {product.in_stock ? (
+                <div className="flex items-center text-green-600">
+                  <CheckCircle className="mr-2" size={20} />
+                  <span className="font-medium">Em estoque</span>
+                </div>
+              ) : (
+                <div className="flex items-center text-red-600">
+                  <AlertCircle className="mr-2" size={20} />
+                  <span className="font-medium">Indisponível</span>
+                </div>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 mb-8">
               <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-6 py-3 rounded-full font-semibold transition-all ${
-                  selectedCategory === category.id
-                    ? 'bg-amber-500 text-white shadow-lg'
-                    : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
-                }`}
+                onClick={() => addToCart(product.id)}
+                disabled={!product.in_stock}
+                className="flex-1 bg-slate-800 hover:bg-slate-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
-                {category.name}
+                <ShoppingCart size={20} />
+                <span>Adicionar ao Carrinho</span>
               </button>
-            ))}
+              
+              <button
+                onClick={openWhatsApp}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2"
+              >
+                <MessageCircle size={20} />
+                <span>Consultar via WhatsApp</span>
+              </button>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="flex flex-col items-center">
+                <Shield className="text-amber-500 mb-2" size={24} />
+                <span className="text-sm text-slate-600">Garantia Premium</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Truck className="text-amber-500 mb-2" size={24} />
+                <span className="text-sm text-slate-600">Entrega Grátis</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <Award className="text-amber-500 mb-2" size={24} />
+                <span className="text-sm text-slate-600">Qualidade Certificada</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:scale-105"
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700"
-                />
-                <div className="absolute top-4 right-4">
-                  <span className="bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {product.category_name}
-                  </span>
-                </div>
-                {!product.in_stock && (
-                  <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center">
-                    <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold">
-                      Indisponível
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-amber-600 transition-colors">
-                  {product.name}
-                </h3>
-                <p className="text-slate-600 mb-4 line-clamp-2">
-                  {product.description}
-                </p>
-                
-                <div className="flex items-center justify-end mb-4">
-                  <button className="text-slate-400 hover:text-red-500 transition-colors">
-                    <Heart size={24} />
-                  </button>
-                </div>
-
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => addToCart(product.id)}
-                    disabled={!product.in_stock}
-                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                  >
-                    <ShoppingCart size={18} />
-                    <span>Carrinho</span>
-                  </button>
-                  <button
-                    onClick={() => openWhatsApp(product)}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
-                  >
-                    <MessageCircle size={18} />
-                  </button>
-                </div>
-              </div>
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div>
+            <h2 className="text-3xl font-bold text-slate-800 mb-8">
+              Produtos Relacionados
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
             </div>
-          ))}
-        </div>
-
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-slate-500 text-xl">Nenhum produto encontrado nesta categoria.</p>
           </div>
         )}
       </div>
-    </section>
+    </div>
+  );
+};
+
+// About Page
+const AboutPage = () => {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'Sobre Nós' }]} />
+        
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+            Sobre a <span className="text-amber-600">Estofados Premium Outlet</span>
+          </h1>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+            Há mais de uma década, transformamos lares com móveis de qualidade excepcional, 
+            design exclusivo e atendimento personalizado no Rio de Janeiro.
+          </p>
+        </div>
+
+        {/* Company Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
+          <div className="text-center bg-white p-6 rounded-lg shadow-md">
+            <div className="text-3xl font-bold text-amber-600 mb-2">10+</div>
+            <div className="text-slate-600">Anos de Experiência</div>
+          </div>
+          <div className="text-center bg-white p-6 rounded-lg shadow-md">
+            <div className="text-3xl font-bold text-amber-600 mb-2">5000+</div>
+            <div className="text-slate-600">Clientes Satisfeitos</div>
+          </div>
+          <div className="text-center bg-white p-6 rounded-lg shadow-md">
+            <div className="text-3xl font-bold text-amber-600 mb-2">50+</div>
+            <div className="text-slate-600">Modelos Exclusivos</div>
+          </div>
+          <div className="text-center bg-white p-6 rounded-lg shadow-md">
+            <div className="text-3xl font-bold text-amber-600 mb-2">100%</div>
+            <div className="text-slate-600">Garantia de Qualidade</div>
+          </div>
+        </div>
+
+        {/* Story Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          <div>
+            <div className="flex items-center mb-6">
+              <Target className="text-amber-500 mr-3" size={32} />
+              <h2 className="text-3xl font-bold text-slate-800">Nossa Missão</h2>
+            </div>
+            <p className="text-slate-600 leading-relaxed">
+              Proporcionar móveis de alta qualidade que combinam conforto, elegância e durabilidade, 
+              transformando cada ambiente em um reflexo da personalidade e estilo de vida dos nossos clientes.
+            </p>
+          </div>
+
+          <div>
+            <div className="flex items-center mb-6">
+              <Zap className="text-amber-500 mr-3" size={32} />
+              <h2 className="text-3xl font-bold text-slate-800">Nossa Visão</h2>
+            </div>
+            <p className="text-slate-600 leading-relaxed">
+              Ser a referência em móveis premium no Rio de Janeiro, reconhecida pela excelência 
+              em produtos, atendimento personalizado e compromisso com a satisfação total dos clientes.
+            </p>
+          </div>
+        </div>
+
+        {/* Values */}
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-slate-800 mb-4">Nossos Valores</h2>
+            <p className="text-slate-600">Os princípios que guiam nosso trabalho todos os dias</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="bg-amber-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Crown className="text-amber-600" size={32} />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Qualidade Premium</h3>
+              <p className="text-slate-600">
+                Selecionamos apenas os melhores materiais e fornecedores para garantir 
+                produtos de qualidade superior.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-amber-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Users className="text-amber-600" size={32} />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Atendimento Personalizado</h3>
+              <p className="text-slate-600">
+                Cada cliente recebe atenção individual, com consultoria especializada 
+                para encontrar a solução perfeita.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="bg-amber-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="text-amber-600" size={32} />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-800 mb-2">Compromisso</h3>
+              <p className="text-slate-600">
+                Cumprimos nossos prazos e garantias, mantendo a transparência 
+                em todas as etapas do processo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact CTA */}
+        <div className="bg-gradient-to-r from-slate-800 to-slate-600 rounded-lg p-8 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">Pronto para conhecer nossos produtos?</h2>
+          <p className="text-xl mb-6">
+            Visite nosso showroom ou entre em contato para uma consultoria personalizada
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/produtos"
+              className="bg-amber-500 hover:bg-amber-600 text-slate-900 px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Ver Produtos
+            </Link>
+            <Link
+              to="/contato"
+              className="border-2 border-white text-white hover:bg-white hover:text-slate-800 px-8 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Fale Conosco
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Contact Page
+const ContactPage = () => {
+  const openWhatsApp = () => {
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de entrar em contato com a Estofados Premium Outlet.`;
+    window.open(url, '_blank');
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'Contato' }]} />
+        
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+            Entre em <span className="text-amber-600">Contato</span>
+          </h1>
+          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            Estamos prontos para atendê-lo com a melhor experiência em móveis premium
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+          {/* Contact Info */}
+          <div className="space-y-8">
+            <div className="flex items-start space-x-4">
+              <div className="bg-amber-500 p-3 rounded-lg">
+                <Phone className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-slate-800 mb-2">Telefone & WhatsApp</h3>
+                <p className="text-slate-600">(21) 99619-7768</p>
+                <button
+                  onClick={openWhatsApp}
+                  className="text-amber-600 hover:text-amber-700 font-semibold mt-1"
+                >
+                  Clique para conversar →
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="bg-amber-500 p-3 rounded-lg">
+                <Mail className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-slate-800 mb-2">Email</h3>
+                <p className="text-slate-600">contato@estofadospremium.com.br</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="bg-amber-500 p-3 rounded-lg">
+                <MapPin className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-slate-800 mb-2">Localização</h3>
+                <p className="text-slate-600">Atendemos todo o Rio de Janeiro</p>
+                <p className="text-slate-600">Entrega gratuita na região metropolitana</p>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-4">
+              <div className="bg-amber-500 p-3 rounded-lg">
+                <Clock className="text-white" size={24} />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-slate-800 mb-2">Horário de Atendimento</h3>
+                <p className="text-slate-600">Segunda a Sexta: 9h às 18h</p>
+                <p className="text-slate-600">Sábado: 9h às 16h</p>
+                <p className="text-slate-600">WhatsApp: 24h disponível</p>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Card */}
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-8 text-white">
+            <div className="text-center">
+              <Crown className="text-amber-400 mx-auto mb-4" size={48} />
+              <h3 className="text-2xl font-bold mb-4">
+                Pronto para transformar sua casa?
+              </h3>
+              <p className="text-slate-300 mb-8 leading-relaxed">
+                Entre em contato conosco e descubra como nossos móveis premium 
+                podem elevar o padrão do seu ambiente com design exclusivo e qualidade superior.
+              </p>
+              
+              <button
+                onClick={openWhatsApp}
+                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
+                           text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
+                           transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mx-auto"
+              >
+                <MessageCircle size={24} />
+                <span>Falar no WhatsApp</span>
+                <ArrowRight size={20} />
+              </button>
+
+              <div className="flex items-center justify-center space-x-6 mt-8 pt-6 border-t border-slate-600">
+                <div className="text-center">
+                  <Shield className="text-amber-400 mx-auto mb-1" size={24} />
+                  <p className="text-sm text-slate-300">Garantia Premium</p>
+                </div>
+                <div className="text-center">
+                  <Truck className="text-amber-400 mx-auto mb-1" size={24} />
+                  <p className="text-sm text-slate-300">Entrega Grátis</p>
+                </div>
+                <div className="text-center">
+                  <Award className="text-amber-400 mx-auto mb-1" size={24} />
+                  <p className="text-sm text-slate-300">Qualidade Certificada</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -661,123 +1273,6 @@ const TestimonialsSection = () => {
               </p>
             </div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Contact Section
-const ContactSection = () => {
-  const openWhatsApp = () => {
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=Olá! Gostaria de entrar em contato com a Estofados Premium Outlet.`;
-    window.open(url, '_blank');
-  };
-
-  return (
-    <section id="contact" className="py-16 bg-slate-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-slate-800 mb-4">
-            Entre em <span className="text-amber-600">Contato</span>
-          </h2>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-            Estamos prontos para atendê-lo com a melhor experiência em móveis premium
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Contact Info */}
-          <div className="space-y-8">
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Phone className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Telefone & WhatsApp</h3>
-                <p className="text-slate-600">(21) 99619-7768</p>
-                <button
-                  onClick={openWhatsApp}
-                  className="text-amber-600 hover:text-amber-700 font-semibold mt-1"
-                >
-                  Clique para conversar →
-                </button>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Mail className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Email</h3>
-                <p className="text-slate-600">contato@estofadospremium.com.br</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <MapPin className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Localização</h3>
-                <p className="text-slate-600">Atendemos todo o Rio de Janeiro</p>
-                <p className="text-slate-600">Entrega gratuita na região metropolitana</p>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4">
-              <div className="bg-amber-500 p-3 rounded-lg">
-                <Sparkles className="text-white" size={24} />
-              </div>
-              <div>
-                <h3 className="text-xl font-semibold text-slate-800 mb-2">Horário de Atendimento</h3>
-                <p className="text-slate-600">Segunda a Sexta: 9h às 18h</p>
-                <p className="text-slate-600">Sábado: 9h às 16h</p>
-                <p className="text-slate-600">WhatsApp: 24h disponível</p>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA Card */}
-          <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-8 text-white">
-            <div className="text-center">
-              <Crown className="text-amber-400 mx-auto mb-4" size={48} />
-              <h3 className="text-2xl font-bold mb-4">
-                Pronto para transformar sua casa?
-              </h3>
-              <p className="text-slate-300 mb-8 leading-relaxed">
-                Entre em contato conosco e descubra como nossos móveis premium 
-                podem elevar o padrão do seu ambiente com design exclusivo e qualidade superior.
-              </p>
-              
-              <button
-                onClick={openWhatsApp}
-                className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 
-                           text-slate-900 font-bold px-8 py-4 rounded-full flex items-center space-x-3 
-                           transition-all transform hover:scale-105 shadow-lg hover:shadow-xl mx-auto"
-              >
-                <MessageCircle size={24} />
-                <span>Falar no WhatsApp</span>
-                <ArrowRight size={20} />
-              </button>
-
-              <div className="flex items-center justify-center space-x-6 mt-8 pt-6 border-t border-slate-600">
-                <div className="text-center">
-                  <Shield className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Garantia Premium</p>
-                </div>
-                <div className="text-center">
-                  <Truck className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Entrega Grátis</p>
-                </div>
-                <div className="text-center">
-                  <Award className="text-amber-400 mx-auto mb-1" size={24} />
-                  <p className="text-sm text-slate-300">Qualidade Certificada</p>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -1037,20 +1532,24 @@ const Footer = () => {
                 <p className="text-sm text-slate-300">PREMIUM OUTLET</p>
               </div>
             </div>
-            <p className="text-slate-300 leading-relaxed max-w-md">
+            <p className="text-slate-300 leading-relaxed max-w-md mb-4">
               Há mais de uma década transformando lares com móveis de qualidade premium. 
               Design exclusivo, conforto incomparável e durabilidade garantida.
+            </p>
+            <p className="text-slate-400 text-sm">
+              CNPJ: 12.345.678/0001-90 | Estofados Premium Outlet Ltda.
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-amber-400 mb-4">Links Rápidos</h4>
+            <h4 className="font-semibold text-amber-400 mb-4">Links Úteis</h4>
             <ul className="space-y-2">
-              <li><a href="#home" className="text-slate-300 hover:text-white transition-colors">Início</a></li>
-              <li><a href="#products" className="text-slate-300 hover:text-white transition-colors">Produtos</a></li>
-              <li><a href="#testimonials" className="text-slate-300 hover:text-white transition-colors">Depoimentos</a></li>
-              <li><a href="#contact" className="text-slate-300 hover:text-white transition-colors">Contato</a></li>
+              <li><Link to="/" className="text-slate-300 hover:text-white transition-colors">Início</Link></li>
+              <li><Link to="/produtos" className="text-slate-300 hover:text-white transition-colors">Produtos</Link></li>
+              <li><Link to="/sobre" className="text-slate-300 hover:text-white transition-colors">Sobre Nós</Link></li>
+              <li><Link to="/contato" className="text-slate-300 hover:text-white transition-colors">Contato</Link></li>
+              <li><Link to="/faq" className="text-slate-300 hover:text-white transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
@@ -1074,27 +1573,35 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-slate-700 mt-8 pt-8 text-center">
-          <p className="text-slate-400">
+        <div className="border-t border-slate-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-slate-400 mb-4 md:mb-0">
             © 2024 Estofados Premium Outlet. Todos os direitos reservados.
           </p>
+          <div className="flex space-x-4 text-slate-400 text-sm">
+            <Link to="/politica-privacidade" className="hover:text-white transition-colors">
+              Política de Privacidade
+            </Link>
+            <Link to="/termos-uso" className="hover:text-white transition-colors">
+              Termos de Uso
+            </Link>
+            <Link to="/politica-troca" className="hover:text-white transition-colors">
+              Política de Troca
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
   );
 };
 
-// Main App Component
+// Main Home Component
 const Home = () => {
   return (
     <div className="min-h-screen">
-      <Header />
       <HeroSection />
       <CategoriesSection />
-      <ProductsSection />
       <TestimonialsSection />
-      <ContactSection />
-      <Footer />
+      <BackToTop />
     </div>
   );
 };
@@ -1104,11 +1611,66 @@ function App() {
     <AppProvider>
       <div className="App">
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/produtos" element={<ProductsPage />} />
+            <Route path="/produto/:id" element={<ProductDetailPage />} />
+            <Route path="/sobre" element={<AboutPage />} />
+            <Route path="/contato" element={<ContactPage />} />
+            {/* Institutional Pages - Simple placeholders for now */}
+            <Route path="/faq" element={
+              <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                  <HelpCircle className="mx-auto mb-4 text-amber-500" size={64} />
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">FAQ - Em Breve</h1>
+                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                    Voltar ao Início
+                  </Link>
+                </div>
+              </div>
+            } />
+            <Route path="/politica-privacidade" element={
+              <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                  <Lock className="mx-auto mb-4 text-amber-500" size={64} />
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Privacidade - Em Breve</h1>
+                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                    Voltar ao Início
+                  </Link>
+                </div>
+              </div>
+            } />
+            <Route path="/termos-uso" element={
+              <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                  <FileText className="mx-auto mb-4 text-amber-500" size={64} />
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Termos de Uso - Em Breve</h1>
+                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                    Voltar ao Início
+                  </Link>
+                </div>
+              </div>
+            } />
+            <Route path="/politica-troca" element={
+              <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                  <RotateCcw className="mx-auto mb-4 text-amber-500" size={64} />
+                  <h1 className="text-3xl font-bold text-slate-800 mb-4">Política de Troca - Em Breve</h1>
+                  <p className="text-slate-600">Esta página estará disponível em breve.</p>
+                  <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+                    Voltar ao Início
+                  </Link>
+                </div>
+              </div>
+            } />
           </Routes>
+          <Footer />
+          <Toaster position="top-right" richColors />
         </BrowserRouter>
-        <Toaster position="top-right" richColors />
       </div>
     </AppProvider>
   );
