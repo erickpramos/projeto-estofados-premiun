@@ -346,13 +346,13 @@ async def initialize_data():
     if existing_categories > 0:
         return
     
-    # Updated categories - REMOVED recamiers, UPDATED descriptions
+    # Updated categories with CORRECTED names and images
     categories_data = [
         {
             "name": "Sofás & Sofás Booth",
             "slug": "sofas",
             "description": "Sofás modernos, de canto e sofás booth para restaurantes",
-            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac"  # Booth sofa image
+            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac"  # Perfect booth sofa
         },
         {
             "name": "Poltronas Premium",
@@ -369,8 +369,14 @@ async def initialize_data():
         {
             "name": "Puffs Modernos",
             "slug": "puffs",
-            "description": "Puffs redondos e quadrados em diversos materiais",
-            "image_url": "https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg"  # Non-knitted puff
+            "description": "Puffs redondos e quadrados em materiais nobres",
+            "image_url": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc"  # Modern ottoman/puff NO KNIT
+        },
+        {
+            "name": "Closet Industrial de Quarto",
+            "slug": "closet-industrial",
+            "description": "Closets industriais de ferro e madeira para quartos modernos",
+            "image_url": "https://images.pexels.com/photos/5710153/pexels-photo-5710153.jpeg"  # Industrial bedroom closet
         },
         {
             "name": "Móveis Industriais",
