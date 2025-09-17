@@ -468,8 +468,8 @@ const Header = () => {
                 className="h-14 w-auto brightness-110 contrast-110 drop-shadow-lg"
               />
               <div className="hidden md:block">
-                <h1 className="text-xl font-bold text-amber-400 drop-shadow-md">ESTOFADOS</h1>
-                <p className="text-sm text-amber-200">PREMIUM OUTLET</p>
+                <h1 className="text-xl font-bold text-amber-600 drop-shadow-sm">ESTOFADOS</h1>
+                <p className="text-sm text-slate-600">PREMIUM OUTLET</p>
               </div>
             </Link>
 
