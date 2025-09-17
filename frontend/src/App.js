@@ -547,27 +547,27 @@ const Header = () => {
 
           {/* Mobile Menu */}
           {isMenuOpen && (
-            <div className="lg:hidden py-4 border-t border-slate-700">
+            <div className="lg:hidden py-4 border-t border-slate-300">
               {/* Mobile Search */}
               <div className="mb-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400" size={20} />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={20} />
                   <input
                     type="text"
                     placeholder="Buscar produtos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-500 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   />
                 </div>
               </div>
               
               <nav className="flex flex-col space-y-4">
-                <Link to="/" className="hover:text-amber-400 transition-colors font-medium">Início</Link>
-                <Link to="/produtos" className="hover:text-amber-400 transition-colors font-medium">Produtos</Link>
-                <Link to="/sobre" className="hover:text-amber-400 transition-colors font-medium">Sobre</Link>
-                <a href="#testimonials" className="hover:text-amber-400 transition-colors font-medium">Depoimentos</a>
-                <Link to="/contato" className="hover:text-amber-400 transition-colors font-medium">Contato</Link>
+                <Link to="/" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Início</Link>
+                <Link to="/produtos" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Produtos</Link>
+                <Link to="/sobre" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Sobre</Link>
+                <a href="#testimonials" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Depoimentos</a>
+                <Link to="/contato" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Contato</Link>
               </nav>
             </div>
           )}
