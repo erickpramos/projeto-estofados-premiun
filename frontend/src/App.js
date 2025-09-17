@@ -498,16 +498,18 @@ const Header = () => {
 
             {/* Actions */}
             <div className="flex items-center space-x-4">
-              {/* WhatsApp Button - LINK DIRETO */}
-              <a
-                href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20Estofados%20Premium%20Outlet."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-all transform hover:scale-105 shadow-lg"
-              >
-                <MessageCircle size={20} />
-                <span className="hidden md:inline font-medium">WhatsApp</span>
-              </a>
+              {/* WhatsApp Button - VERSÃO ULTRA SIMPLES */}
+              <div>
+                <a
+                  href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20Estofados%20Premium%20Outlet."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg flex items-center space-x-2 transition-all transform hover:scale-105 shadow-lg"
+                >
+                  <MessageCircle size={20} />
+                  <span className="hidden md:inline font-medium">WhatsApp</span>
+                </a>
+              </div>
 
               {/* Cart */}
               <button
