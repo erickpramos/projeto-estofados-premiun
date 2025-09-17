@@ -508,14 +508,14 @@ async def initialize_data():
         product = Product(**prod_data)
         await db.products.insert_one(product.dict())
     
-    # Sample reviews with real people images
+    # Sample reviews with real people images - gender matched
     reviews_data = [
         {
             "user_name": "Mariana Silva",
             "user_location": "Copacabana, RJ",
             "rating": 5,
             "comment": "Excelente qualidade! O sofá chegou no prazo e superou minhas expectativas. Recomendo!",
-            "user_image": "https://images.unsplash.com/photo-1727063453176-567739afef75"
+            "user_image": "https://images.unsplash.com/photo-1720098110121-26aa70b87bfc"
         },
         {
             "user_name": "Carlos Mendes",
@@ -529,14 +529,14 @@ async def initialize_data():
             "user_location": "Ipanema, RJ",
             "rating": 5,
             "comment": "A poltrona ficou perfeita na minha sala. Conforto e elegância em um só produto!",
-            "user_image": "https://images.unsplash.com/photo-1720098110121-26aa70b87bfc"
+            "user_image": "https://images.pexels.com/photos/2019926/pexels-photo-2019926.jpeg"
         },
         {
             "user_name": "Roberto Lima",
             "user_location": "Tijuca, RJ",
             "rating": 4,
             "comment": "Ótima experiência de compra. Móveis de qualidade e entrega rápida.",
-            "user_image": "https://images.pexels.com/photos/2019926/pexels-photo-2019926.jpeg"
+            "user_image": "https://images.pexels.com/photos/9957954/pexels-photo-9957954.jpeg"
         },
         {
             "user_name": "Julia Santos",
