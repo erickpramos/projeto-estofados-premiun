@@ -572,10 +572,7 @@ const ProductsSection = () => {
                   {product.description}
                 </p>
                 
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-3xl font-bold text-amber-600">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </span>
+                <div className="flex items-center justify-end mb-4">
                   <button className="text-slate-400 hover:text-red-500 transition-colors">
                     <Heart size={24} />
                   </button>
