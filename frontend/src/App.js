@@ -444,7 +444,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-black text-white shadow-2xl relative z-50">
+      <header className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 text-white shadow-2xl relative z-50">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
