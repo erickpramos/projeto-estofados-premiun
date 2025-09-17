@@ -340,8 +340,8 @@ async def shutdown_db_client():
     client.close()
 
 async def initialize_data():
-    """Initialize categories, products and reviews if they don't exist"""
-    # FORCE UPDATE - Clear existing categories first
+    """Initialize categories, products and reviews - ALWAYS REFRESH"""
+    # FORCE UPDATE - Clear existing data
     await db.categories.delete_many({})
     await db.products.delete_many({})
     await db.reviews.delete_many({})
@@ -352,7 +352,7 @@ async def initialize_data():
             "name": "Sofás & Sofás Booth",
             "slug": "sofas",
             "description": "Sofás modernos, de canto e sofás booth para restaurantes",
-            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac"  # Perfect booth sofa
+            "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac"
         },
         {
             "name": "Poltronas Premium",
@@ -370,13 +370,13 @@ async def initialize_data():
             "name": "Puffs Modernos",
             "slug": "puffs",
             "description": "Puffs redondos e quadrados em materiais nobres",
-            "image_url": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc"  # Modern ottoman/puff NO KNIT
+            "image_url": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc"
         },
         {
             "name": "Closet Industrial de Quarto",
             "slug": "closet-industrial",
             "description": "Closets industriais de ferro e madeira para quartos modernos",
-            "image_url": "https://images.pexels.com/photos/5710153/pexels-photo-5710153.jpeg"  # Industrial bedroom closet
+            "image_url": "https://images.pexels.com/photos/5710153/pexels-photo-5710153.jpeg"
         },
         {
             "name": "Móveis Industriais",
@@ -395,41 +395,91 @@ async def initialize_data():
     categories = await db.categories.find().to_list(length=None)
     category_map = {cat["slug"]: cat for cat in categories}
     
-    # Updated products
+    # Products including 8 SOFÁS BOOTH with different colors
     products_data = [
-        # Sofás & Booth
+        # 8 SOFÁS BOOTH - DIFERENTES CORES
         {
-            "name": "Sofá Moderno Verde",
-            "description": "Sofá moderno de 3 lugares em tecido verde com pés de madeira",
-            "price": 2499.90,
+            "name": "Sofá Booth Clássico Vermelho",
+            "description": "Sofá booth estilo americano clássico com estofado vermelho, perfeito para restaurantes e lanchonetes",
+            "price": 3299.90,
             "category_id": category_map["sofas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc",
-            "images": ["https://images.unsplash.com/photo-1555041469-a586c61ea9bc"],
-            "specifications": {"lugares": "3", "material": "Tecido", "cor": "Verde"},
+            "image_url": "https://images.pexels.com/photos/6188604/pexels-photo-6188604.jpeg",
+            "images": ["https://images.pexels.com/photos/6188604/pexels-photo-6188604.jpeg"],
+            "specifications": {"lugares": "4", "material": "Courino", "cor": "Vermelho", "tipo": "Booth"},
             "in_stock": True
         },
         {
-            "name": "Sofá Booth para Restaurante",
-            "description": "Sofá booth clássico ideal para restaurantes e cafeterias",
-            "price": 3899.90,
+            "name": "Sofá Booth Elegante Preto",
+            "description": "Sofá booth em couro preto elegante, ideal para ambientes sofisticados e modernos",
+            "price": 3599.90,
+            "category_id": category_map["sofas"]["id"],
+            "image_url": "https://images.unsplash.com/photo-1623092564189-ca8296cb118e",
+            "images": ["https://images.unsplash.com/photo-1623092564189-ca8296cb118e"],
+            "specifications": {"lugares": "4", "material": "Couro", "cor": "Preto", "tipo": "Booth"},
+            "in_stock": True
+        },
+        {
+            "name": "Sofá Booth Vintage Marrom",
+            "description": "Sofá booth marrom vintage com acabamento em couro envelhecido, traz charme retrô",
+            "price": 3399.90,
+            "category_id": category_map["sofas"]["id"],
+            "image_url": "https://images.pexels.com/photos/9316937/pexels-photo-9316937.jpeg",
+            "images": ["https://images.pexels.com/photos/9316937/pexels-photo-9316937.jpeg"],
+            "specifications": {"lugares": "4", "material": "Couro", "cor": "Marrom", "tipo": "Booth"},
+            "in_stock": True
+        },
+        {
+            "name": "Sofá Booth Moderno Verde",
+            "description": "Sofá booth verde moderno com design contemporâneo, ideal para cafeterias e bistros",
+            "price": 3499.90,
+            "category_id": category_map["sofas"]["id"],
+            "image_url": "https://images.unsplash.com/photo-1671713682194-764a7c8dbc71",
+            "images": ["https://images.unsplash.com/photo-1671713682194-764a7c8dbc71"],
+            "specifications": {"lugares": "4", "material": "Tecido", "cor": "Verde", "tipo": "Booth"},
+            "in_stock": True
+        },
+        {
+            "name": "Sofá Booth Clássico Azul",
+            "description": "Sofá booth azul com design clássico americano, perfeito para diners e restaurantes tradicionais",
+            "price": 3199.90,
             "category_id": category_map["sofas"]["id"],
             "image_url": "https://images.unsplash.com/photo-1549800076-831d7a97afac",
             "images": ["https://images.unsplash.com/photo-1549800076-831d7a97afac"],
-            "specifications": {"lugares": "4", "material": "Courino", "cor": "Marrom", "tipo": "Booth"},
+            "specifications": {"lugares": "4", "material": "Courino", "cor": "Azul", "tipo": "Booth"},
             "in_stock": True
         },
         {
-            "name": "Sofá de Canto Modular",
-            "description": "Sofá modular de canto que se adapta ao seu espaço",
-            "price": 4299.90,
+            "name": "Sofá Booth Premium Bege",
+            "description": "Sofá booth bege premium com estofado macio, ideal para ambientes elegantes e aconchegantes",
+            "price": 3799.90,
             "category_id": category_map["sofas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1757416654883-c73c67b3382b",
-            "images": ["https://images.unsplash.com/photo-1757416654883-c73c67b3382b"],
-            "specifications": {"lugares": "5", "material": "Tecido", "cor": "Marrom", "tipo": "Modular"},
+            "image_url": "https://images.unsplash.com/photo-1627449545079-7f553ce5d029",
+            "images": ["https://images.unsplash.com/photo-1627449545079-7f553ce5d029"],
+            "specifications": {"lugares": "4", "material": "Tecido", "cor": "Bege", "tipo": "Booth"},
+            "in_stock": True
+        },
+        {
+            "name": "Sofá Booth Industrial Cinza",
+            "description": "Sofá booth cinza com design industrial, combinando estilo urbano com conforto excepcional",
+            "price": 3699.90,
+            "category_id": category_map["sofas"]["id"],
+            "image_url": "https://images.unsplash.com/photo-1667743291869-78da918c65d5",
+            "images": ["https://images.unsplash.com/photo-1667743291869-78da918c65d5"],
+            "specifications": {"lugares": "4", "material": "Courino", "cor": "Cinza", "tipo": "Booth"},
+            "in_stock": True
+        },
+        {
+            "name": "Sofá Booth Luxo Caramelo",
+            "description": "Sofá booth caramelo de luxo em couro legítimo, oferece máximo conforto e sofisticação",
+            "price": 3999.90,
+            "category_id": category_map["sofas"]["id"],
+            "image_url": "https://images.pexels.com/photos/1574854/pexels-photo-1574854.jpeg",
+            "images": ["https://images.pexels.com/photos/1574854/pexels-photo-1574854.jpeg"],
+            "specifications": {"lugares": "4", "material": "Couro", "cor": "Caramelo", "tipo": "Booth"},
             "in_stock": True
         },
         
-        # Poltronas
+        # Outros produtos existentes
         {
             "name": "Poltrona Branca Moderna",
             "description": "Par de poltronas brancas modernas para sala de estar",
@@ -441,59 +491,23 @@ async def initialize_data():
             "in_stock": True
         },
         {
-            "name": "Poltrona Giratória Premium",
-            "description": "Poltrona giratória em couro com base giratória",
-            "price": 2599.90,
-            "category_id": category_map["poltronas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7",
-            "images": ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7"],
-            "specifications": {"material": "Couro", "cor": "Amarelo", "estilo": "Giratória"},
-            "in_stock": True
-        },
-        
-        # Almofadas
-        {
-            "name": "Kit Almofadas Coloridas",
-            "description": "Conjunto de 3 almofadas coloridas para decoração",
-            "price": 299.90,
-            "category_id": category_map["almofadas"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1553114552-c4ece3a33c93",
-            "images": ["https://images.unsplash.com/photo-1553114552-c4ece3a33c93"],
-            "specifications": {"quantidade": "3", "tamanho": "45x45cm", "material": "Algodão"},
-            "in_stock": True
-        },
-        
-        # Puffs (SEM tricô)
-        {
-            "name": "Puff Redondo Moderno",
-            "description": "Puff redondo em tecido liso para sala ou quarto",
+            "name": "Puff Moderno Cinza",
+            "description": "Puff moderno em tecido cinza para sala ou quarto",
             "price": 399.90,
             "category_id": category_map["puffs"]["id"],
-            "image_url": "https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg",
-            "images": ["https://images.pexels.com/photos/6894013/pexels-photo-6894013.jpeg"],
+            "image_url": "https://images.unsplash.com/photo-1560448204-603b3fc33ddc",
+            "images": ["https://images.unsplash.com/photo-1560448204-603b3fc33ddc"],
             "specifications": {"formato": "Redondo", "material": "Tecido", "cor": "Cinza"},
             "in_stock": True
         },
-        
-        # Móveis Industriais
         {
-            "name": "Mesa Industrial Ferro e Madeira",
-            "description": "Mesa de jantar industrial com estrutura de ferro e tampo de madeira",
-            "price": 1899.90,
-            "category_id": category_map["moveis-industriais"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1593022445207-836cf2396054",
-            "images": ["https://images.unsplash.com/photo-1593022445207-836cf2396054"],
-            "specifications": {"material": "Ferro e Madeira", "lugares": "6", "estilo": "Industrial"},
-            "in_stock": True
-        },
-        {
-            "name": "Estante Industrial",
-            "description": "Estante industrial de ferro e madeira para decoração",
-            "price": 1299.90,
-            "category_id": category_map["moveis-industriais"]["id"],
-            "image_url": "https://images.unsplash.com/photo-1682718619781-252f23e21132",
-            "images": ["https://images.unsplash.com/photo-1682718619781-252f23e21132"],
-            "specifications": {"material": "Ferro e Madeira", "prateleiras": "4", "estilo": "Industrial"},
+            "name": "Closet Industrial de Quarto",
+            "description": "Closet industrial de ferro e madeira, ideal para quartos modernos e lofts",
+            "price": 2499.90,
+            "category_id": category_map["closet-industrial"]["id"],
+            "image_url": "https://images.pexels.com/photos/5710153/pexels-photo-5710153.jpeg",
+            "images": ["https://images.pexels.com/photos/5710153/pexels-photo-5710153.jpeg"],
+            "specifications": {"material": "Ferro e Madeira", "portas": "2", "estilo": "Industrial"},
             "in_stock": True
         }
     ]
@@ -509,60 +523,46 @@ async def initialize_data():
     # CORRECTED reviews with matching gender photos
     reviews_data = [
         {
-            "user_name": "Mariana Silva",  # FEMININO
+            "user_name": "Mariana Silva",
             "user_location": "Copacabana, RJ",
             "rating": 5,
-            "comment": "Excelente qualidade! O sofá chegou no prazo e superou minhas expectativas. Recomendo!",
-            "user_image": "https://images.unsplash.com/photo-1494790108755-2616b612b786"  # MULHER
+            "comment": "Comprei um sofá booth vermelho para meu café e ficou perfeito! Qualidade excepcional e muito confortável.",
+            "user_image": "https://images.unsplash.com/photo-1494790108755-2616b612b786"
         },
         {
-            "user_name": "Carlos Mendes",  # MASCULINO
+            "user_name": "Carlos Mendes",
             "user_location": "Barra da Tijuca, RJ",
             "rating": 5,
-            "comment": "Atendimento excepcional e produtos de primeira qualidade. Muito satisfeito!",
-            "user_image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"  # HOMEM
+            "comment": "O sofá booth preto que comprei superou todas as expectativas. Meus clientes adoraram!",
+            "user_image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e"
         },
         {
-            "user_name": "Ana Paula Santos",  # FEMININO
+            "user_name": "Ana Paula Santos",
             "user_location": "Ipanema, RJ",
             "rating": 5,
-            "comment": "A poltrona ficou perfeita na minha sala. Conforto e elegância em um só produto!",
-            "user_image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"  # MULHER
+            "comment": "Poltrona perfeita para minha sala. Design moderno e muito confortável. Recomendo!",
+            "user_image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
         },
         {
-            "user_name": "Roberto Lima",  # MASCULINO
+            "user_name": "Roberto Lima",
             "user_location": "Tijuca, RJ",
             "rating": 4,
-            "comment": "Ótima experiência de compra. Móveis de qualidade e entrega rápida.",
-            "user_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"  # HOMEM
+            "comment": "Closet industrial ficou incrível no meu quarto. Qualidade e design excepcionais!",
+            "user_image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
         },
         {
-            "user_name": "Julia Costa",  # FEMININO
+            "user_name": "Julia Costa",
             "user_location": "Leblon, RJ",
             "rating": 5,
-            "comment": "Amei meu novo sofá! Design moderno e muito confortável. Recomendo a todos!",
-            "user_image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2"  # MULHER
+            "comment": "Sofá booth verde para meu bistro ficou um espetáculo. Clientes elogiam sempre!",
+            "user_image": "https://images.unsplash.com/photo-1544005313-94ddf0286df2"
         },
         {
-            "user_name": "Pedro Oliveira",  # MASCULINO
+            "user_name": "Pedro Oliveira",
             "user_location": "Flamengo, RJ",
             "rating": 5,
-            "comment": "Comprei uma mesa industrial e ficou perfeita no meu escritório. Qualidade excepcional!",
-            "user_image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"  # HOMEM
-        },
-        {
-            "user_name": "Fernanda Alves",  # FEMININO
-            "user_location": "Botafogo, RJ",
-            "rating": 5,
-            "comment": "Atendimento personalizado e produtos lindos. Transformaram minha sala completamente!",
-            "user_image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb"  # MULHER
-        },
-        {
-            "user_name": "Ricardo Santos",  # MASCULINO
-            "user_location": "Recreio, RJ",
-            "rating": 4,
-            "comment": "Boa qualidade e preço justo. Recomendo para quem busca móveis diferenciados.",
-            "user_image": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d"  # HOMEM
+            "comment": "Atendimento personalizado e produtos de primeira. Sofá booth caramelo é luxo puro!",
+            "user_image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
         }
     ]
     
@@ -571,7 +571,7 @@ async def initialize_data():
         review = Review(**review_data)
         await db.reviews.insert_one(review.dict())
     
-    # CREATE ADMIN USER FOR OWNER
+    # CREATE ADMIN USER
     admin_user = {
         "id": str(uuid.uuid4()),
         "name": "Admin Estofados",
@@ -582,3 +582,7 @@ async def initialize_data():
         "is_admin": True
     }
     await db.users.insert_one(admin_user)
+    
+    print("✅ DADOS INICIALIZADOS COM SUCESSO!")
+    print("📦 8 Sofás Booth adicionados com cores diferentes")
+    print("👤 Usuário admin criado: admin@estofados.com / admin123")
