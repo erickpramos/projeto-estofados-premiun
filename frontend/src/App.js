@@ -493,7 +493,7 @@ const ProductsSection = () => {
   }, [selectedCategory, products]);
 
   const openWhatsApp = (product) => {
-    const message = `Olá! Tenho interesse no produto: ${product.name} - R$ ${product.price.toFixed(2).replace('.', ',')}. Gostaria de mais informações.`;
+    const message = `Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações.`;
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
