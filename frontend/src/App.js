@@ -456,8 +456,8 @@ const Header = () => {
 
   return (
     <>
-      {/* PERFECT header color for logo visibility */}
-      <header className="bg-gradient-to-r from-indigo-900 via-slate-900 to-indigo-900 text-white shadow-2xl relative z-50">
+      {/* HEADER COM COR CLARA PARA DESTACAR O LOGO */}
+      <header className="bg-gradient-to-r from-slate-100 via-white to-slate-100 text-slate-800 shadow-2xl relative z-50 border-b border-slate-200">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-20">
             {/* Logo - NOW PERFECTLY VISIBLE */}
