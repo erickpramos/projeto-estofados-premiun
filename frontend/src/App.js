@@ -1074,8 +1074,284 @@ const CartModal = ({ onClose }) => {
   );
 };
 
-// Simplified Main Components for space
-const ProductsPage = () => <div className="min-h-screen bg-slate-50 p-8"><h1 className="text-3xl">Produtos - Em desenvolvimento</h1></div>;
+// Admin Panel Component
+const AdminPanel = () => {
+  const { user, categories, products, loadData } = useAppContext();
+  const [activeTab, setActiveTab] = useState('products');
+  const [isLoading, setIsLoading] = useState(false);
+  const [productForm, setProductForm] = useState({
+    name: '',
+    description: '',
+    price: '',
+    category_id: '',
+    image_url: '',
+    images: [],
+    specifications: {},
+    in_stock: true
+  });
+
+  // Check if user is admin
+  if (!user || !user.is_admin) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <Lock className="mx-auto mb-4 text-red-500" size={64} />
+          <h1 className="text-3xl font-bold text-slate-800 mb-4">Acesso Negado</h1>
+          <p className="text-slate-600">Você precisa ser administrador para acessar esta área.</p>
+          <Link to="/" className="text-amber-600 hover:text-amber-700 font-medium mt-4 inline-block">
+            Voltar ao Início
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const handleProductSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API}/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...productForm,
+          price: parseFloat(productForm.price),
+          images: productForm.images.filter(img => img.trim())
+        })
+      });
+
+      if (response.ok) {
+        toast.success('Produto criado com sucesso!');
+        setProductForm({
+          name: '', description: '', price: '', category_id: '', 
+          image_url: '', images: [], specifications: {}, in_stock: true
+        });
+        loadData();
+      } else {
+        throw new Error('Erro ao criar produto');
+      }
+    } catch (error) {
+      toast.error('Erro ao criar produto');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <div className="container mx-auto px-4 py-8">
+        <Breadcrumb items={[{ label: 'Painel Administrativo' }]} />
+        
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-slate-800 mb-4">
+            🛠️ Painel <span className="text-amber-600">Administrativo</span>
+          </h1>
+          <p className="text-xl text-slate-600">
+            Gerencie produtos, categorias e conteúdo da loja
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-8">
+          <div className="flex space-x-4 border-b">
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`pb-2 px-4 ${activeTab === 'products' ? 'border-b-2 border-amber-500 text-amber-600' : 'text-slate-600'}`}
+            >
+              📦 Produtos ({products.length})
+            </button>
+            <button
+              onClick={() => setActiveTab('add-product')}
+              className={`pb-2 px-4 ${activeTab === 'add-product' ? 'border-b-2 border-amber-500 text-amber-600' : 'text-slate-600'}`}
+            >
+              ➕ Adicionar Produto
+            </button>
+            <button
+              onClick={() => setActiveTab('categories')}
+              className={`pb-2 px-4 ${activeTab === 'categories' ? 'border-b-2 border-amber-500 text-amber-600' : 'text-slate-600'}`}
+            >
+              📂 Categorias ({categories.length})
+            </button>
+          </div>
+        </div>
+
+        {/* Products List */}
+        {activeTab === 'products' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold mb-6">Produtos Cadastrados</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map(product => (
+                <div key={product.id} className="border rounded-lg p-4">
+                  <img 
+                    src={product.image_url} 
+                    alt={product.name}
+                    className="w-full h-32 object-cover rounded mb-3"
+                  />
+                  <h3 className="font-semibold text-slate-800">{product.name}</h3>
+                  <p className="text-sm text-slate-600 mb-2">{product.category_name}</p>
+                  <p className="text-amber-600 font-bold">R$ {product.price?.toFixed(2)}</p>
+                  <span className={`inline-block px-2 py-1 rounded text-xs mt-2 ${
+                    product.in_stock ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                  }`}>
+                    {product.in_stock ? 'Em estoque' : 'Indisponível'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Add Product Form */}
+        {activeTab === 'add-product' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold mb-6">Adicionar Novo Produto</h2>
+            
+            <form onSubmit={handleProductSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Nome do Produto *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    placeholder="Ex: Sofá Moderno 3 Lugares"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Categoria *
+                  </label>
+                  <select
+                    required
+                    value={productForm.category_id}
+                    onChange={(e) => setProductForm({...productForm, category_id: e.target.value})}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    {categories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Descrição *
+                </label>
+                <textarea
+                  required
+                  rows={4}
+                  value={productForm.description}
+                  onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  placeholder="Descreva o produto detalhadamente..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Preço (R$) *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={productForm.price}
+                    onChange={(e) => setProductForm({...productForm, price: e.target.value})}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    placeholder="0,00"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={productForm.in_stock}
+                    onChange={(e) => setProductForm({...productForm, in_stock: e.target.value === 'true'})}
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  >
+                    <option value="true">Em estoque</option>
+                    <option value="false">Indisponível</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  URL da Imagem Principal *
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={productForm.image_url}
+                  onChange={(e) => setProductForm({...productForm, image_url: e.target.value})}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                  placeholder="https://exemplo.com/imagem.jpg"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-4 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center space-x-2"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Criando produto...</span>
+                  </>
+                ) : (
+                  <>
+                    <Package size={20} />
+                    <span>Criar Produto</span>
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Categories */}
+        {activeTab === 'categories' && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold mb-6">Categorias</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categories.map(category => (
+                <div key={category.id} className="border rounded-lg p-4">
+                  <img 
+                    src={category.image_url} 
+                    alt={category.name}
+                    className="w-full h-32 object-cover rounded mb-3"
+                  />
+                  <h3 className="font-semibold text-slate-800">{category.name}</h3>
+                  <p className="text-sm text-slate-600">{category.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 const ProductDetailPage = () => <div className="min-h-screen bg-slate-50 p-8"><h1 className="text-3xl">Produto - Em desenvolvimento</h1></div>;
 const AboutPage = () => <div className="min-h-screen bg-slate-50 p-8"><h1 className="text-3xl">Sobre - Em desenvolvimento</h1></div>;
 const ContactPage = () => <div className="min-h-screen bg-slate-50 p-8"><h1 className="text-3xl">Contato - Em desenvolvimento</h1></div>;
