@@ -489,11 +489,11 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              <Link to="/" className="hover:text-amber-400 transition-colors font-medium">Início</Link>
-              <Link to="/produtos" className="hover:text-amber-400 transition-colors font-medium">Produtos</Link>
-              <Link to="/sobre" className="hover:text-amber-400 transition-colors font-medium">Sobre</Link>
-              <a href="#testimonials" className="hover:text-amber-400 transition-colors font-medium">Depoimentos</a>
-              <Link to="/contato" className="hover:text-amber-400 transition-colors font-medium">Contato</Link>
+              <Link to="/" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Início</Link>
+              <Link to="/produtos" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Produtos</Link>
+              <Link to="/sobre" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Sobre</Link>
+              <a href="#testimonials" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Depoimentos</a>
+              <Link to="/contato" className="hover:text-amber-600 transition-colors font-medium text-slate-700">Contato</Link>
             </nav>
 
             {/* Actions */}
