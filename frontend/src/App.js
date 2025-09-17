@@ -849,12 +849,6 @@ const CartModal = ({ onClose }) => {
 
         {cart.items.length > 0 && (
           <div className="p-6 border-t bg-slate-50">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xl font-bold text-slate-800">Total:</span>
-              <span className="text-2xl font-bold text-amber-600">
-                R$ {cart.total.toFixed(2).replace('.', ',')}
-              </span>
-            </div>
             <button
               onClick={openWhatsApp}
               className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg 
