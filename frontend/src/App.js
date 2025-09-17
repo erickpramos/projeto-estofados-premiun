@@ -790,11 +790,10 @@ const CartModal = ({ onClose }) => {
 
   const openWhatsApp = () => {
     const items = cart.items.map(item => 
-      `${item.product_name} (${item.quantity}x) - R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}`
+      `${item.product_name} (${item.quantity}x)`
     ).join('\n');
     
-    const total = cart.total.toFixed(2).replace('.', ',');
-    const message = `Olá! Gostaria de finalizar minha compra:\n\n${items}\n\nTotal: R$ ${total}\n\nPor favor, me ajude com o processo de compra.`;
+    const message = `Olá! Gostaria de finalizar minha compra:\n\n${items}\n\nPor favor, me ajude com o processo de compra.`;
     
     const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
