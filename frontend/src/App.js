@@ -748,6 +748,10 @@ const HeroSection = () => {
               <MessageCircle size={24} />
               <span>Fale Conosco no WhatsApp</span>
               <ArrowRight size={20} />
+            </a>
+              <MessageCircle size={24} />
+              <span>Fale Conosco no WhatsApp</span>
+              <ArrowRight size={20} />
             </button>
             
             <Link
