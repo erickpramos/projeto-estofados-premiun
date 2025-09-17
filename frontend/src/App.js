@@ -830,13 +830,10 @@ const CartModal = ({ onClose }) => {
                   <div className="flex-1">
                     <h3 className="font-semibold text-slate-800">{item.product_name}</h3>
                     <p className="text-slate-600">
-                      R$ {item.price.toFixed(2).replace('.', ',')} x {item.quantity}
+                      Quantidade: {item.quantity}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-amber-600">
-                      R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
-                    </p>
                     <button
                       onClick={() => removeFromCart(item.product_id)}
                       className="text-red-500 hover:text-red-700 mt-1"
