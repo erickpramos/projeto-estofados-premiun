@@ -1506,6 +1506,7 @@ function App() {
             <Route path="/sobre" element={<AboutPage />} />
             <Route path="/contato" element={<ContactPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/admin" element={<AdminPanel />} />
           </Routes>
           <Footer />
           <WhatsAppFloat />
