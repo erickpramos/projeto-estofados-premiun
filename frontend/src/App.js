@@ -514,11 +514,11 @@ const Header = () => {
               {/* Cart */}
               <button
                 onClick={() => setShowCart(true)}
-                className="relative p-2 hover:text-amber-400 transition-colors"
+                className="relative p-2 hover:text-amber-600 transition-colors text-slate-700"
               >
                 <ShoppingCart size={24} />
                 {cart.items.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
                     {cart.items.reduce((total, item) => total + item.quantity, 0)}
                   </span>
                 )}
@@ -527,7 +527,7 @@ const Header = () => {
               {/* User */}
               <button
                 onClick={() => setShowAuth(true)}
-                className="flex items-center space-x-2 hover:text-amber-400 transition-colors"
+                className="flex items-center space-x-2 hover:text-amber-600 transition-colors text-slate-700"
               >
                 <User size={24} />
                 <span className="hidden md:inline font-medium">
@@ -538,7 +538,7 @@ const Header = () => {
               {/* Mobile Menu */}
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="lg:hidden p-1"
+                className="lg:hidden p-1 text-slate-700"
               >
                 {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
