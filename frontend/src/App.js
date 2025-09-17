@@ -95,11 +95,21 @@ const AppProvider = ({ children }) => {
     headers: token ? { Authorization: `Bearer ${token}` } : {}
   });
 
-  // WhatsApp helper function
+  // WhatsApp helper function - CORRIGIDO
   const openWhatsApp = (message = "Olá! Gostaria de saber mais sobre os produtos da Estofados Premium Outlet.") => {
     const encodedMessage = encodeURIComponent(message);
-    const url = `https://wa.me/5521996197768?text=${encodedMessage}`;
-    window.open(url, '_blank');
+    const url = `https://api.whatsapp.com/send?phone=5521996197768&text=${encodedMessage}`;
+    
+    // Tenta abrir primeiro com api.whatsapp.com
+    const whatsappWindow = window.open(url, '_blank');
+    
+    // Se não conseguir, tenta com wa.me como fallback
+    if (!whatsappWindow) {
+      const fallbackUrl = `https://wa.me/5521996197768?text=${encodedMessage}`;
+      window.open(fallbackUrl, '_blank');
+    }
+    
+    console.log('WhatsApp URL:', url);
   };
 
   const login = async (email, password) => {
