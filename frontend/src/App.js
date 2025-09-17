@@ -605,13 +605,7 @@ const Breadcrumb = ({ items }) => {
 
 // Product Card Component
 const ProductCard = ({ product }) => {
-  const { addToCart, openWhatsApp } = useAppContext();
-
-  const handleWhatsApp = () => {
-    const message = encodeURIComponent(`Olá! Tenho interesse no produto: ${product.name}. Gostaria de mais informações sobre disponibilidade, detalhes e condições de pagamento.`);
-    const url = `https://wa.me/5521996197768?text=${message}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
+  const { addToCart } = useAppContext();
 
   return (
     <div className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:scale-105">
@@ -662,12 +656,14 @@ const ProductCard = ({ product }) => {
             <ShoppingCart size={18} />
             <span>Carrinho</span>
           </button>
-          <button
-            onClick={handleWhatsApp}
+          <a
+            href={`https://wa.me/5521996197768?text=Ol%C3%A1!%20Tenho%20interesse%20no%20produto:%20${encodeURIComponent(product.name)}.%20Gostaria%20de%20mais%20informa%C3%A7%C3%B5es.`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <MessageCircle size={18} />
-          </button>
+          </a>
         </div>
       </div>
     </div>
