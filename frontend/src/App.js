@@ -362,19 +362,20 @@ const BackToTop = () => {
   );
 };
 
-// WhatsApp Floating Button - VERSÃO MAIS SIMPLES
+// WhatsApp Floating Button - VERSÃO ULTRA SIMPLES
 const WhatsAppFloat = () => {
   return (
-    <a
-      href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20Estofados%20Premium%20Outlet."
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition-all z-50 animate-pulse hover:animate-none hover:scale-110"
-      aria-label="Falar no WhatsApp"
-      title="Clique para falar no WhatsApp"
-    >
-      <MessageCircle size={24} />
-    </a>
+    <div className="fixed bottom-6 right-6 z-50">
+      <a
+        href="https://wa.me/5521996197768?text=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20os%20produtos%20da%20Estofados%20Premium%20Outlet."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-xl transition-all animate-pulse hover:animate-none hover:scale-110"
+        title="Clique para falar no WhatsApp"
+      >
+        <MessageCircle size={24} />
+      </a>
+    </div>
   );
 };
 
